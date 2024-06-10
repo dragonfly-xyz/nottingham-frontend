@@ -1,0 +1,20 @@
+@use './breakpoints.scss' as *;
+
+:root {
+    --bg-color: rgb(255, 245, 218);
+}
+:global(body) {
+    background-color: var(--bg-color);
+    color: #4a352c;
+    margin: 0;
+    min-height: 100vh; 
+    cursor: url('/pointer.png') 5 5, pointer;
+
+    @include mobile {
+        cursor: auto;
+    }
+}
+
+// a, button {
+//     cursor: url('/pointer-active.png'), auto !important;
+// }

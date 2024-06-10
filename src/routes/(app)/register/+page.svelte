@@ -1,0 +1,349 @@
+<script lang="ts">
+    import { onMount } from "svelte";
+    import Page from "$lib/components/page.svelte";
+    import { INVITE_ONLY, getSiteContext } from "$lib/site";
+    import { PUBLIC_GH_CLIENT_ID, PUBLIC_REGISTRAR_URL } from "$env/static/public";
+    import { page } from '$app/stores';
+    import { ONE_HOUR, UserError, getFriendlyErrorMsg, randomHex } from "$lib/util";
+    import { goto } from "$app/navigation";
+    import {
+        hexToNumber,
+        keccak256,
+        sliceHex,
+        stringToBytes,
+    } from "viem";
+    import Lede from "$lib/components/lede.svelte";
+    import CatSpinner from "$lib/components/cat-spinner.svelte";
+    import { CONTEST_ADDRESS, readContestContract, waitForTxSuccess, writeContestContract } from "$lib/contest";
+    import { createBusy, type BusyState } from "$lib/kit";
+    import { base } from "$app/paths";
+
+    const {
+        wallet,
+        publicClient,
+    } = getSiteContext();
+    let busyState: BusyState;
+    const busyAwait = createBusy(r => busyState = r);
+    const redirectUrl = (() => {
+        const url = new URL($page.url);
+        url.search = '';
+        url.searchParams.append('callback', '');
+        return url.toString();
+    })();
+    const REGISTER_REQUEST_DOMAIN_PARTIAL = {
+        name: 'Nottingham',
+        version: '1',
+        verifyingContract: CONTEST_ADDRESS,
+    } as const;
+
+    let registered: boolean = false;
+    let authCode: string | null = null;
+    let authInfo: {
+        userId: string;
+        email: string;
+        hmac: string;
+    } | null = null;
+    let inviteCode: string | null = null;
+    let playerName: string | null = null;
+    let termsAgreed: boolean = false;
+    let adultAgreed: boolean = false;
+
+    $: {
+        if (registered && playerName) {
+            goto(`./player?${new URLSearchParams({ name: playerName }).toString()}`);
+        }
+    }
+
+    async function login(): Promise<void> {
+        const loginUrl = new URL('https://github.com/login/oauth/authorize');
+        const state = randomHex();
+        localStorage.setItem('ghAuthState', state);
+        loginUrl.searchParams.append('prompt', 'consent');
+        loginUrl.searchParams.append('client_id', PUBLIC_GH_CLIENT_ID);
+        loginUrl.searchParams.append('redirect_uri', redirectUrl);
+        loginUrl.searchParams.append('scope', ['user:email'].join(' '));
+        loginUrl.searchParams.append('state', state);
+        window.location.href = loginUrl.toString();
+    }
+
+    onMount(async () => {
+        authCode = $page.url.searchParams.get('code');
+        const state = $page.url.searchParams.get('state');
+        if (!authCode || !state) {
+            return;
+        }
+        {
+            const url = new URL($page.url);
+            url.search = '';
+            goto(url);
+        }
+        const expectedState = localStorage.getItem('ghAuthState');
+        if (state !== expectedState) {
+            console.error(`Incorrect state hash from OAuth redirect!`);
+            return;
+        }
+        await busyAwait((async () => {
+            const resp = await fetch(`${PUBLIC_REGISTRAR_URL}/redeem`, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({
+                    githubAuth: authCode,
+                    redirectUri: redirectUrl,
+                }),
+            });
+            if (!resp.ok) {
+                const { error: errorMsg } = await resp.json();
+                throw new UserError(`Failed OAuth step: ${errorMsg}`);
+            }
+            const user = await resp.json();
+            authInfo = { userId: user.userId, email: user.email, hmac: user.hmac };
+            playerName = (user.name as string).toLowerCase().replaceAll(/[^a-z0-9_]/g,'');
+        })());
+    });
+
+    async function register(): Promise<void> {
+        if (!playerName || !authInfo) {
+            return;
+        }
+        await busyAwait((async () => {
+            const registeredBlock = await readContestContract({
+                client: publicClient,
+                fn: 'playerRegisteredBlock',
+                args: [$wallet!.address],
+            });
+            if (registeredBlock !== 0n) {
+                throw new UserError(`Address is already registered`);
+            }
+            let confirmation;
+            {
+                const expiry = Math.floor(Date.now() / 1e3) + ONE_HOUR;
+                const signature = await ($wallet?.client! as any).signTypedData({
+                    account: $wallet?.address!,
+                    domain: { ...REGISTER_REQUEST_DOMAIN_PARTIAL, chainId: $wallet!.chain!.id },
+                    types: {
+                        'Register Request': [
+                            { name: 'name', type: 'string' },
+                            { name: 'expiry', type: 'uint256' },
+                            { name: 'auth', type: 'string' },
+                        ]
+                    },
+                    primaryType: 'Register Request',
+                    message: {
+                        name: playerName,
+                        expiry: BigInt(expiry),
+                        auth: keccak256(stringToBytes(authInfo.userId)),
+                    },
+                });
+                const resp = await fetch(`${PUBLIC_REGISTRAR_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({
+                        name: playerName,
+                        ...authInfo,
+                        expiry,
+                        signature,
+                        inviteCode: inviteCode ?? undefined,
+                    }),
+                });
+                if (!resp.ok) {
+                    const { error: errorMsg } = await resp.json();
+                    throw new UserError(`Failed to request registration: ${errorMsg}`);
+                }
+                confirmation = (await resp.json()).confirmation;
+            }
+            const txHash = await writeContestContract({
+                client: $wallet!.client,
+                fn: 'register',
+                args: [
+                    $wallet!.address,
+                    {
+                        expiry: confirmation.expiry,
+                        nonce: confirmation.nonce,
+                        metadata: confirmation.metadata,
+                        r: sliceHex(confirmation.signature, 0, 32),
+                        s: sliceHex(confirmation.signature, 32, 64),
+                        v: hexToNumber(sliceHex(confirmation.signature, 64)),
+                    },
+                ],
+            });
+            console.info(`Registration tx hash: ${txHash}`);
+            await Promise.all([
+                (async () => {
+                    const resp = await fetch(`${PUBLIC_REGISTRAR_URL}/confirm`, {
+                        method: 'POST',
+                        headers: { 'content-type': 'application/json' },
+                        body: JSON.stringify({
+                            address: $wallet!.address,
+                            txHash,
+                        }),
+                    });
+                    if (!resp.ok) {
+                        const { error: errorMsg } = await resp.json();
+                        throw new UserError(`Failed to confirm registration: ${
+                            errorMsg}`);
+                    }
+                })(),
+                waitForTxSuccess(publicClient, txHash),
+            ]);
+            registered = true;
+        })());
+    }
+</script>
+
+<style lang="scss">
+    @use "../../../lib/styles/global.scss" as *;
+
+    .error {
+        margin: 1em auto;
+        color: red;
+    }
+
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        iframe {
+            display: block;
+            width: 90%;
+            height: 16em;
+            margin: 0 auto;
+            background-color: transparent;
+        }
+
+        .checkboxes {
+            margin-top: 1em;
+        }
+
+    }
+
+    .register-form {
+        margin: 0 auto;
+        width: fit-content;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        align-items: center;
+
+        .inputs {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2ex;
+
+            @include mobile {
+                flex-direction: column;
+            }
+        }
+
+        > div:last-child {
+            align-self: end;
+        }
+    }
+
+</style>
+
+<Page title="Register Merchant">
+    <Lede>
+        <h1>Registration</h1>
+        <p>
+            This game is strictly for nerds so players must have a valid Github account to register. We may need to reach out to you about the contest (look for an "@dragonfly.xyz" email), so please make sure the email attached to the account is correct and reachable.
+        </p>
+    </Lede>
+    {#if !authInfo}
+    <section>
+        <form class="auth-form" on:submit|preventDefault={() => login()}>
+            <iframe src={`${base}/terms/rules.html`} title="rules" />
+            <div class="checkboxes">
+                <div>
+                    <input
+                        type="checkbox" bind:checked={termsAgreed}
+                        id="terms-agree"
+                        disabled={busyState instanceof Promise}
+                    />
+                    <label for="terms-agree">
+                        By registering, you agree to our
+                        <a href={`${base}/rules`} target="_blank">Contest Rules</a> and
+                        <a href={`${base}/privacy`} target="_blank">Privacy Agreement</a>.
+                    </label>
+                </div>
+                <div>
+                    <input
+                        type="checkbox" bind:checked={adultAgreed}
+                        id="adult-agree"
+                        disabled={busyState instanceof Promise}
+                    />
+                    <label for="adult-agree">
+                        By registering, you confirm that you are at least 18 years of age.
+                    </label>
+                </div>
+            </div>
+            <p>
+                <button
+                    type="submit"
+                    disabled={busyState instanceof Promise || !termsAgreed || !adultAgreed}
+                    aria-busy={busyState instanceof Promise}
+                >
+                    Authenticate on Github
+                </button>
+            </p>
+        </form>
+    </section>
+    {:else}
+    {#if $wallet}
+    <section>
+        <p>
+            The connected wallet address (<em>{$wallet.address}</em>) will <em>publicly</em> identify your merchant onchain and will be used to make code submissions and claim prizes. You can authorize other addresses to submit code on your behalf, but only this address can ever claim prizes.
+        </p>
+        <p>
+            This wallet will also need to be supplied with a small amount of ETH on the {$wallet.chain.name} network to complete registration and to make code submissions.{#if $wallet.chain.id === 324}  You can bridge ETH from Ethereum to {$wallet.chain.name} <a href="https://portal.zksync.io/bridge/" target="_blank">here</a>.{/if}
+        </p>
+    </section>
+    <section>
+        <form class="register-form" on:submit|preventDefault={() => register()}>
+            <div class="inputs">
+                {#if !INVITE_ONLY}
+                <div>
+                    <label for="invite-code">Invite Code</label>
+                    <input placeholder="Invite code" bind:value={inviteCode} id="invite-code" />
+                </div>
+                {/if}
+                <div>
+                    <label for="name">Player Name</label>
+                    <input
+                        id="name"
+                        placeholder="Player name"
+                        bind:value={playerName}
+                        pattern="^[a-z0-9_]+$"
+                        minlength="3"
+                        maxlength="32"
+                        required />
+                </div>
+            </div>
+            <div>
+                <button
+                    type="submit"
+                    disabled={busyState instanceof Promise || registered}
+                    aria-busy={busyState instanceof Promise}
+                >
+                    Register
+                </button>
+            </div>
+        </form>
+    </section>
+    {:else}
+    <section>
+        <p>Connect your wallet to continue</p>
+    </section>
+    {/if}
+    {/if}
+    {#if busyState instanceof Error}
+    <section class="error">
+        {getFriendlyErrorMsg(busyState)}
+    </section>
+    {:else if busyState instanceof Promise}
+    <section class="spinner">
+        <CatSpinner />
+    </section>
+    {/if}
+</Page>
