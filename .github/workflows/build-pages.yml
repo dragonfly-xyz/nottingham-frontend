@@ -23,11 +23,8 @@ jobs:
           echo 'cannot target main branch' \
           && exit 1
       - name: prepare env
-        env:
-          # Inlining toJSON will not create valid JSON?
-          VARS_JSON: "${{ toJSON(vars) }}"
         run: |
-          echo "$VARS_JSON" |  jq -r 'keys[] as $k | "\($k)=\(.[$k])"' >> $GITHUB_ENV
+          echo "${{ vars.DOTENV }}" | tr '\r' '\n' >> $GITHUB_ENV
       - name: install deps
         run: npm i --include=dev
       - name: build

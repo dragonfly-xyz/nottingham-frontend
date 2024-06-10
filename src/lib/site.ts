@@ -21,7 +21,7 @@ import { PUBLIC_CHAIN_ID, PUBLIC_RPC_URL } from "$env/static/public";
 export const MAINTENANCE_MODE = !!publicEnv.PUBLIC_MAINTENANCE_MODE;
 export const ANNOUNCEMENT = publicEnv.PUBLIC_ANNOUNCEMENT ?? null;
 export const INVITE_ONLY = !!publicEnv.PUBLIC_INVITE_ONLY;
-export const LAUNCHED = !!publicEnv.PUBLIC_LAUNCHED;
+export const LAUNCHED = new Date(publicEnv.PUBLIC_LAUNCH_TIME ?? 0).getTime() < Date.now();
 
 export interface ScoredPlayer {
     name: string;
