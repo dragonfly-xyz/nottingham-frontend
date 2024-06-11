@@ -42,8 +42,10 @@
     } satisfies SiteContext);
 
     onMount(() => {
-        fetchContestState();
-        refreshTimer = setInterval(fetchContestState, 120e3);
+        if (LAUNCHED) {
+            fetchContestState();
+            refreshTimer = setInterval(fetchContestState, 120e3);
+        }
     });
 
     onDestroy(() => {
@@ -307,10 +309,10 @@
         {/if} 
         <header>
             <div class="left">
+                {#if LAUNCHED}
                 <div>
                     <a href={`${base}/`}>Home</a>
                 </div>
-                {#if LAUNCHED}
                 <div>
                     <a href={`${base}/#progress`}>Progress</a>
                 </div>
