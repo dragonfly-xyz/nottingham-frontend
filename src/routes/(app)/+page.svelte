@@ -4,7 +4,7 @@
     import Lede from "$lib/components/lede.svelte";
     import Page from "$lib/components/page.svelte";
     import { CONTEST_ADDRESS } from "$lib/contest";
-    import { LAUNCHED, getSiteContext } from "$lib/site";
+    import { LAUNCHED, LAUNCH_TIME, SCHEDULE, SCHEDULED_PRIZES, getSiteContext } from "$lib/site";
     import type { Chain } from "viem";
 
     const { publicClient } = getSiteContext();
@@ -46,6 +46,41 @@
             > li {
                 margin-bottom: 0.5em;
             }
+        }
+    }
+
+    #timeline {
+        > .events {
+            display: flex;
+            flex-direction: column;
+
+            > .event, .prize-event {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+
+                > * {
+                    flex: 1 0 fit-content;
+                }
+
+                > .spacer {
+                    display: contents;
+                    
+                    &::after {
+                        content: '..................................................................................................................................................................................................................................';
+                        overflow: hidden;
+                        text-overflow: clip;
+                        display: block;
+                        flex: 0 1 auto;
+                        opacity: 0.25;
+                    }
+                }
+            }
+        }
+
+        > .disclaimer {
+            text-align: right;
+            font-size: 0.75em;
         }
     }
 </style>
@@ -91,6 +126,40 @@
         <p>
             Code submissions are published onchain but are encrypted with a key that will only be revealed when the season is closed (right before the Grand Faire). This allows players to decrypt past season winners to train against and incentivizes players to gradually refine their solutions.
         </p>
+        {#if SCHEDULE.length}
+        <div id="timeline">
+            <h3>Timeline</h3>
+            <div class="events">
+                {#if LAUNCH_TIME.getTime() != 0}
+                <div class="event">
+                    <div>{LAUNCH_TIME.toLocaleDateString()}</div>
+                    <div class="spacer" />
+                    <div>Contest Launch</div>
+                </div>
+                {/if}
+                {#each SCHEDULE as time, i}
+                <div class="prize-event">
+                    <div class="date">{ time.toLocaleDateString() }</div>
+                    <div class="spacer" />
+                    <div class="name">
+                        Grand Faire
+                        {#if SCHEDULED_PRIZES[i]}
+                        (prize: ${ Number(SCHEDULED_PRIZES[i]).toLocaleString() }*)
+                        {/if}
+                    </div>
+                </div>
+                {/each}
+            </div>
+            {#if SCHEDULED_PRIZES.length}
+            <div class="disclaimer">
+                (* Prizes are USD equivalent of ETH, valued approximately at time of contest launch)
+            </div>
+            <div class="disclaimer">
+                (Dates are subject to change)
+            </div>
+            {/if}
+        </div>
+        {/if}
     </section>
     {#if LAUNCHED}
     <section id="progress">

@@ -3,10 +3,11 @@
         type TournamentType,
         getSiteContext,
         type ScoredPlayer,
+        SCHEDULE,
     } from "$lib/site";
-    import { PUBLIC_DATA_URL, PUBLIC_SEASON_DURATION_SECONDS } from "$env/static/public";
+    import { PUBLIC_DATA_URL } from "$env/static/public";
     import { formatEther } from 'viem';
-    import { ONE_DAY_MS, cmpDate, getFriendlyErrorMsg } from "$lib/util";
+    import { ONE_DAY_MS, ONE_HOUR_MS, ONE_MINUTE_MS, cmpDate, getFriendlyErrorMsg } from "$lib/util";
     import CatSpinner from "$lib/components/cat-spinner.svelte";
     import { base } from "$app/paths";
     import { createBusy, type BusyState } from "$lib/kit";
@@ -48,8 +49,29 @@
         );
     }
 
-    function getProjectedEndTime(startTime: Date): Date {
-        return new Date(startTime.getTime() + Number(PUBLIC_SEASON_DURATION_SECONDS) * 1e3);
+    function getProjectedEndTime(seasonIdx: number): Date | null {
+        if (!SCHEDULE[seasonIdx]) {
+            return null;
+        }
+        return SCHEDULE[seasonIdx];
+    }
+
+    function getHumanTimeLeft(when: Date): string {
+        const dt = when.getTime() - Date.now();
+        if (dt > ONE_DAY_MS) {
+            return `${Math.round(dt / ONE_DAY_MS)} days`;
+        }
+        if (dt >= ONE_HOUR_MS * 2) {
+            return `${Math.round(dt / ONE_HOUR_MS)} hours`;
+        }
+        if (dt > ONE_HOUR_MS) {
+            return `${Math.round(dt / ONE_HOUR_MS)} hour`;
+        }
+        if (dt > ONE_MINUTE_MS * 2) {
+            return `${Math.round(dt / ONE_HOUR_MS)} minutes`;
+        }
+        console.log(when, dt);
+        return `a few seconds`;
     }
 </script>
 
@@ -111,10 +133,8 @@
                 {#if szn.closedTime}
                 (Ended on {szn.closedTime.toLocaleDateString()})
                 {:else}
-                {#if (getProjectedEndTime(szn.startTime).getTime() - Date.now()) < ONE_DAY_MS}
-                (Ends in less than a day)
-                {:else}
-                (Ends in {Math.round((getProjectedEndTime(szn.startTime).getTime() - Date.now()) / ONE_DAY_MS)} days)
+                {#if getProjectedEndTime(szn.idx)}
+                (Ends in {getHumanTimeLeft(getProjectedEndTime(szn.idx) ?? new Date(0))})
                 {/if}
                 {/if}
             </span>

@@ -446,10 +446,10 @@
                         aria-busy={submittingCodeState instanceof Promise}
                         disabled={submittingCodeState instanceof Promise}
                     >
-                        {#if typeof(submittingCodeState) === 'string' && submittingCodeState !== '0x'}
-                        Submitted!
+                        {#if submittingCodeState instanceof Promise || (typeof(submittingCodeState) === 'string' && submittingCodeState !== '0x')}
+                        Code Submitted!
                         {:else}
-                        Submit
+                        Submit Code
                         {/if}
                     </button>
                     {#if submittingCodeState instanceof Error}
