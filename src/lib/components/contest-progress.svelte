@@ -26,6 +26,7 @@
     let loadState: BusyState;
     const loadAwait = createBusy(r => loadState = r);
     let tournamentsBySeason: Record<number, TournamentResult[]> = {};
+    export let maxTournaments = 5;
 
     onMount(async () => {
         tournamentsBySeason = await loadAwait(fetchTournaments);
@@ -128,7 +129,7 @@
     <div class="season">
         <h3>
             <img class="leaf" src={`${base}/leaf.png`} alt="season" />
-            Season {szn.idx + 1}
+            <a href={`/season?season=${szn.idx + 1}`}>Season {szn.idx + 1}</a>
             <span class="smaller">
                 {#if szn.closedTime}
                 (Ended on {szn.closedTime.toLocaleDateString()})
@@ -146,7 +147,7 @@
         </h3>
         <div class="tournaments">
             {#if tournamentsBySeason[szn.idx]?.length}
-            {#each tournamentsBySeason[szn.idx].slice().sort((a, b) => cmpDate(b.time, a.time)) as t, j (j)}
+            {#each tournamentsBySeason[szn.idx].slice().sort((a, b) => cmpDate(b.time, a.time)).slice(0, maxTournaments) as t, j (j)}
             <div class="entry">
                 <h3>
                     <a href={`${base}/tournament?season=${szn.idx + 1}&id=${t.id}`}>
@@ -166,6 +167,11 @@
                 </div>
             </div>
             {/each}
+            {#if tournamentsBySeason[szn.idx].length > maxTournaments}
+            <div class="more">
+                <a href={`/season?season=${szn.idx + 1}`}>{tournamentsBySeason[szn.idx].length - maxTournaments} more matches...</a>
+            </div>
+            {/if}
             {:else}
             <div>No games.</div>
             {/if}

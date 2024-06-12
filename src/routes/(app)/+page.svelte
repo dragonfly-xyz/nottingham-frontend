@@ -115,14 +115,14 @@
         <img src={`${base}/aristocrat.png`} alt="medieval illustration" />
         <img src={`${base}/merchants.png`} alt="medieval illustration" />
     </div>
-    <section>
-        <h2>Gameplay</h2>
+    <section id="gameplay">
+        <h2><a href="#gameplay" class="inherit">Gameplay</a></h2>
         <p>
             Searchers of Nottingham is a multiplayer, <a href="https://chain.link/education-hub/maximal-extractable-value-mev" target="_blank">MEV</a>-themed game built on the <a href="https://ethereum.org" target="_blank">Ethereum</a> Virtual Machine. Players submit compiled <a href="https://ethereum.org/en/developers/docs/smart-contracts/" target="_blank">smart contracts</a> which represent Merchants at a medieval fair trying to stock their stall with goods (tokens). Merchants face each other in multiple small games. Each round Merchants will try to exchange their gold and goods at the Market (a constant product <a href="https://chain.link/education-hub/what-is-an-automated-market-maker-amm" target="_blank">AMM</a>). But a Merchant can also choose to bid gold to become the Sheriff for that round. The Sheriff chooses the order in which all trades are made and can also make their own trades at will. The first Merchant to acquire the maximum amount of any single good will win!
         </p>
     </section>
-    <section>
-        <h2>The Contest</h2>
+    <section id="contest">
+        <h2><a href="#contest" class="inherit">The Contest</a></h2>
         <p>
             The contest will run approximately over a period of 15 days, with every 5 days marking a "Season." Seasons are made up of quick, daily tournaments and one final and conclusive tournament on the last day. Tournaments pit all players in the season against each other to produce an overall ranking.
         </p>
@@ -135,7 +135,7 @@
         <p>
             The contest is free to join, but you will need a small amount of ETH on <a href={Object.values(chain.blockExplorers ?? {})[0].url} target="_blank">{chain.name}</a> to cover gas for registration, submissions, and to claim any prizes.
         </p>
-        <h3>Tournaments</h3>
+        <h3 id="tournaments"><a href="#tournaments" class="inherit">Tournaments</a></h3>
         <p>
             Players are ranked in a series of <em>offchain</em> tournament-style matches against each other, consisting of 4 players at a time. The top performing players of each bracket advance into the next bracket, and so on. The player that maintains the highest overall ranking in the final bracket wins the tournament!
         </p>
@@ -147,7 +147,7 @@
         </p>
         {#if SCHEDULE.length}
         <div id="timeline">
-            <h3>Timeline</h3>
+            <h3><a href="#timeline" class="inherit">Timeline</a></h3>
             <div class="events">
                 {#if LAUNCH_TIME.getTime() != 0}
                 <div class="event">
@@ -182,14 +182,14 @@
     </section>
     {#if LAUNCHED}
     <section id="progress">
-        <h2>Contest Progress</h2>
+        <h2><a href="#progress" class="inherit">Contest Progress</a></h2>
         <div class="content">
             <ContestProgress />
         </div>
     </section>
     {/if}
-    <section class="resources">
-        <h2>Resources</h2>
+    <section id="resources" class="resources">
+        <h2><a href="#resources" class="inherit">Resources</a></h2>
         <ul>
             {#if LAUNCHED}
             <li>
