@@ -417,7 +417,7 @@
             <h2>Submit code for season {(currentSeason.idx ?? 0) + 1}</h2>
             {#if !playerIsActive}
             <p>
-                You have not submitted player code for the current season, so you are not participating in any games.
+                You have not submitted player code for the current season, so you are not participating in any games!
             </p>
             {:else}
             <p>

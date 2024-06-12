@@ -19,8 +19,7 @@
     import IconButton from "$lib/components/icon-button.svelte";
     import { base } from "$app/paths";
     import {
-        fetchSeasons,
-        multiReadContestContract,
+        fetchContestState,
         type SeasonInfo,
     } from "$lib/contest";
     import { createReadable } from "$lib/kit";
@@ -43,8 +42,8 @@
 
     onMount(() => {
         if (LAUNCHED) {
-            fetchContestState();
-            refreshTimer = setInterval(fetchContestState, 120e3);
+            loadContestState();
+            refreshTimer = setInterval(loadContestState, 120e3);
         }
     });
 
@@ -87,9 +86,7 @@
                 setPlayerName(null);
                 const resp = await fetch(`${PUBLIC_DATA_URL}/whois?${new URLSearchParams({
                     address: $wallet.address,
-                })}`, {
-                    headers: { 'content-type': 'application/json' },
-                });
+                })}`);
                 if (!resp.ok) {
                     if (resp.status !== 404) {
                         const { error: errorMsg } = await resp.json();
@@ -102,36 +99,8 @@
         }
     }
 
-    async function fetchContestState(): Promise<void> {
-        const lastSeason = $seasons[$seasons.length - 1];
-        const newSeasonsInfo = await fetchSeasons(
-            publicClient,
-            lastSeason ? lastSeason.startBlock : undefined,
-        )
-        const currentSeasons = $seasons;
-        for (const newSzn of newSeasonsInfo) {
-            if (newSzn.idx >= currentSeasons.length) {
-                currentSeasons.push(newSzn);
-                continue;
-            }
-            Object.assign(currentSeasons[newSzn.idx], newSzn);
-        }
-        {
-            const seasonsWithUnclaimedPrizes = currentSeasons
-                .filter(s => s.unclaimedPrize !== 0n)
-                .map(s => s.idx);
-            const seasonWins = await multiReadContestContract<[Address, bigint][]>({
-                client: publicClient,
-                calls: seasonsWithUnclaimedPrizes.map(idx => ({
-                    fn: 'winner', args: [idx],
-                })),
-            });
-            for (const [i, idx] of seasonsWithUnclaimedPrizes.entries()) {
-                currentSeasons[idx].winner = seasonWins[i][0];
-                currentSeasons[idx].unclaimedPrize = seasonWins[i][1];
-            }
-        }
-        setSeasons(currentSeasons);
+    async function loadContestState(): Promise<void> {
+        setSeasons(await fetchContestState(publicClient));
     }
 
     function toggleMusic() {
@@ -307,9 +276,9 @@
             {ANNOUNCEMENT}
         </div>
         {/if} 
+        {#if LAUNCHED}
         <header>
             <div class="left">
-                {#if LAUNCHED}
                 <div>
                     <a href={`${base}/`}>Home</a>
                 </div>
@@ -329,11 +298,9 @@
                 <div>
                     <a href={`${base}/players`}>Merchants</a>
                 </div>
-                {/if}
             </div>
             <div class="right">
                 <div>
-                    {#if LAUNCHED}
                     <WalletHost
                         on:connected={onConnected}
                         on:disconnected={onDisconnected}
@@ -371,10 +338,10 @@
                             </div>
                         </div>
                     </WalletHost>
-                    {/if}
                 </div>
             </div>
         </header>
+        {/if}
         <main>
             <slot></slot>
         </main>

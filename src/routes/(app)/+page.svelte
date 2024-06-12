@@ -54,10 +54,20 @@
             display: flex;
             flex-direction: column;
 
+            @include mobile {
+                gap: 0.5em;
+            }
+
             > .event, .prize-event {
                 display: flex;
                 flex-direction: row;
                 justify-content: space-between;
+
+                @include mobile {
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                }
 
                 > * {
                     flex: 1 0 fit-content;
@@ -65,6 +75,10 @@
 
                 > .spacer {
                     display: contents;
+
+                    @include mobile {
+                        display: none;
+                    }
                     
                     &::after {
                         content: '..................................................................................................................................................................................................................................';
@@ -81,6 +95,11 @@
         > .disclaimer {
             text-align: right;
             font-size: 0.75em;
+
+            @include mobile {
+                margin-top: 0.5em;
+                text-align: center;
+            }
         }
     }
 </style>

@@ -16,6 +16,7 @@ import { PUBLIC_CHAIN_ID, PUBLIC_CONTEST_ADDRESS } from "$env/static/public";
 import * as publicEnv from "$env/static/public";
 import CONTEST_ABI_ from '$lib/contest-abi.json';
 import type { Address } from "viem/accounts";
+import { cmpBigInt } from "./util";
 
 export const CONTEST_CHAIN_ID = Number(PUBLIC_CHAIN_ID);
 export const CONTEST_ADDRESS = PUBLIC_CONTEST_ADDRESS as Address;
@@ -165,80 +166,126 @@ export interface SeasonInfo {
     closedTime: Date | null;
 }
 
-export async function fetchSeasons(
+export interface ChainEvent {
+    eventId: string;
+    eventBlockNumber: number;
+    eventTransactionIndex: number;
+    eventLogIndex: number;
+    eventName: string;
+    [field: string]: any;
+}
+
+export async function fetchContestState(
     client: PublicClient,
-    startBlock?: number,
 ): Promise<SeasonInfo[]> {
-    const [logs, [currentPrize, currentSeasonIdx]] = await Promise.all([
-        getContestLogs(
-            client, [
-                'SeasonStarted',
-                'SeasonClosed',
-                'SeasonRevealed',
-                'WinnerDeclared',
-                'PrizeClaimed',
-            ],
-            startBlock,
-        ),
-        multiReadContestContract<[bigint, number]>({
-            client,
-            calls: [
-                { fn: 'currentSeasonPrize' },
-                { fn: 'currentSeasonIdx' },
-            ],
-        }),
+    const {
+        blockNumber: indexedBlockNumber,
+        events: indexedEvents
+    } = await fetchIndexedContestEvents();
+
+    const [liveEvents, currentSeasonPrize] = await Promise.all([
+        fetchContestLogsAsChainEvents(client, indexedBlockNumber + 1),
+        readContestContract({ client, fn: 'currentSeasonPrize' }),
     ]);
-    const seasonsByIdx = {} as { [idx: number]: SeasonInfo };
-    for (const log of logs) {
-        const { args } = log;
-        const blockNumber = Number(log.blockNumber);
-        if (log.eventName === 'SeasonStarted') {
-            seasonsByIdx[args.season] = {
-                idx: args.season,
-                winner: null,
+    const events = sortChainEvents([...indexedEvents, ...liveEvents]);
+    const seasons = [] as SeasonInfo[];
+    for (const event of events) {
+        if (event.eventName === 'SeasonStarted') {
+            seasons.push({
+                idx: event.season,
+                startBlock: event.eventBlockNumber,
                 closedBlock: null,
-                startBlock: blockNumber,
+                startTime: new Date(),
                 closedTime: null,
-                startTime: new Date(0),
                 prize: 0n,
                 state: SeasonState.Started,
+                winner: null,
                 unclaimedPrize: 0n,
-                privateKey: '0x',
-                publicKey: args.publicKey,
-            };
-            continue;
-        }
-        const szn = seasonsByIdx[args.season];
-        if (!szn) {
-            console.warn(`Found event for missing season idx: ${args.season}`);
-        }
-        if (log.eventName === 'SeasonClosed') {
-            szn.state = SeasonState.Closed;
-            szn.closedBlock = blockNumber;
-        } else if (log.eventName === 'SeasonRevealed') {
-            szn.privateKey = args.privateKey;
-            szn.state = SeasonState.Revealed;
-        } else if (log.eventName === 'WinnerDeclared') {
-            if (args.season in seasonsByIdx) {
-                const winSeason = seasonsByIdx[args.season];
-                winSeason.winner = args.winner; 
-                winSeason.prize = args.prize;
-                winSeason.unclaimedPrize = args.prize;
-            }
-        } else {
-            if (args.season in seasonsByIdx) {
-                const winSeason = seasonsByIdx[args.season];
-                winSeason.prize = args.prize; 
-                winSeason.unclaimedPrize = 0n; 
-            }
+                privateKey: null,
+                publicKey: event.publicKey,
+            });
+        } else if (event.eventName === 'SeasonClosed') {
+            const season = seasons[event.season];
+            season.state = SeasonState.Closed;
+            season.closedBlock = event.eventBlockNumber;
+            season.closedTime = new Date();
+        } else if (event.eventName === 'SeasonRevealed') {
+            const season = seasons[event.season];
+            season.state = SeasonState.Revealed;
+            season.privateKey = event.privateKey;
+        } else if (event.eventName === 'WinnerDeclared') {
+            const season = seasons[event.season];
+            season.winner = event.winner;
+            season.prize = season.unclaimedPrize = event.prize;
+        } else if (event.eventName === 'PrizeClaimed') {
+            const season = seasons[event.season];
+            season.prize = event.prize;
+            season.unclaimedPrize = 0n;
         }
     }
-    if (seasonsByIdx[currentSeasonIdx]) {
-        seasonsByIdx[currentSeasonIdx].prize = currentPrize;
+    {
+        const lastSeason = seasons[seasons.length - 1];
+        if (lastSeason?.state === SeasonState.Started) {
+            lastSeason.unclaimedPrize = lastSeason.prize = currentSeasonPrize;
+        }
     }
+    return resolveSeasonBlockTimes(client, seasons);
+}
+
+function sortChainEvents(events: ChainEvent[]): ChainEvent[] {
+    const ids = events.map(
+        event => (BigInt(event.eventBlockNumber) << 64n) |
+            (BigInt(event.eventTransactionIndex) << 32n) |
+            BigInt(event.eventLogIndex),
+    );
+    return events
+        .map((_, i) => i)
+        .sort((a, b) => cmpBigInt(ids[a], ids[b]))
+        .map(idx => events[idx]);
+}
+
+async function fetchIndexedContestEvents()
+    : Promise<{ events: ChainEvent[]; blockNumber: number; }>
+{
+    const resp = await fetch(`${publicEnv.PUBLIC_DATA_URL}/indexed/seasons?`);
+    if (!resp.ok) {
+        throw new Error(`Failed to fetch indexed data`);
+    }
+    return resp.json();
+}
+
+export async function fetchContestLogsAsChainEvents(
+    client: PublicClient,
+    startBlock: number,
+): Promise<ChainEvent[]> {
+    const logs = await getContestLogs(
+        client,
+        [
+            'SeasonStarted',
+            'SeasonClosed',
+            'SeasonRevealed',
+            'WinnerDeclared',
+            'PrizeClaimed',
+        ],
+        startBlock,
+    );
+    return logs.map(log => ({
+        eventId: '',
+        eventBlockNumber: Number(log.blockNumber),
+        eventTransactionIndex: log.transactionIndex!,
+        eventLogIndex: log.logIndex!,
+        eventName: log.eventName,
+        ...log.args,
+    }));
+}
+
+export async function resolveSeasonBlockTimes(
+    client: PublicClient,
+    seasons: SeasonInfo[],
+): Promise<SeasonInfo[]> {
     // Get block times.
     const uniqueBlocks = Object.values(Object.assign({},
-        ...Object.values(seasonsByIdx)
+        ...seasons
             .map(szn => [szn.startBlock, szn.closedBlock])
             .flat(1)
             .filter(v => typeof(v) === 'number')
@@ -248,7 +295,6 @@ export async function fetchSeasons(
     const blockTimeByNumber = Object.assign({},
         ...uniqueBlocks.map((n, i) => ({ [n]: blockTimes[i] })),
     ) as Record<number, Date>;
-    const seasons = Object.values(seasonsByIdx).sort((a, b) => a.idx - b.idx);
     for (const szn of seasons) {
         szn.startTime = blockTimeByNumber[szn.startBlock];
         if (szn.closedBlock) {

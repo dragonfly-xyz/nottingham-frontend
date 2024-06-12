@@ -7,7 +7,6 @@
 
     .page {
         @extend .content-font;
-        padding: 1em 1ex;
         position: relative;
         
         .content {

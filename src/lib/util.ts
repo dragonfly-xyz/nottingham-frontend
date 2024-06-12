@@ -22,9 +22,9 @@ export function randomName(letters: number = 12): string {
 
 export function sortLogs<T extends Log>(logs: T[], reversed: boolean = false): T[] {
     const ids = logs.map(
-        log => (log.blockNumber! << 96n) |
+        log => (log.blockNumber! << 64n) |
             (BigInt(log.transactionIndex!) << 32n) |
-            (BigInt(log.logIndex!) << 32n),
+            BigInt(log.logIndex!),
     );
     const idxs = logs.map((_, i) => i);
     if (reversed) {
