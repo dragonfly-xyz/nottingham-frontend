@@ -169,7 +169,7 @@
             {/each}
             {#if tournamentsBySeason[szn.idx].length > maxTournaments}
             <div class="more">
-                <a href={`/season?season=${szn.idx + 1}`}>{tournamentsBySeason[szn.idx].length - maxTournaments} more matches...</a>
+                <a href={`/season?season=${szn.idx + 1}`}>{tournamentsBySeason[szn.idx].length - maxTournaments} more tournaments...</a>
             </div>
             {/if}
             {:else}

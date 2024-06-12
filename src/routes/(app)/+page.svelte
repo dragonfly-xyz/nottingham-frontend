@@ -130,7 +130,7 @@
             On every day but the last of a season, two "Market Day" tournaments will be held. These tournaments award no prizes but can give players a sense of how well their contract performs against others.
         </p>
         <p>
-            On the last day of the season, a single "Grand Faire" tournament is held. Unlike Market Day tournaments, the Grand Faire DOES award prizes (in ETH) to the winner, and will also consist of more matches for certainty. The Grand Faire prize increases with each successive season, as players naturally become more sophisticated with time.
+            On the last day of the season, a single "Grand Faire" tournament is held. The Grand Faire DOES award prizes (in ETH) to the winner, and will also consist of more matches for certainty. The Grand Faire prize increases with each successive season, as players naturally become more sophisticated with time.
         </p>
         <p>
             The contest is free to join, but you will need a small amount of ETH on <a href={Object.values(chain.blockExplorers ?? {})[0].url} target="_blank">{chain.name}</a> to cover gas for registration, submissions, and to claim any prizes.
