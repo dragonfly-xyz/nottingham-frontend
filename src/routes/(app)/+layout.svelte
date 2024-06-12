@@ -242,6 +242,10 @@
             max-width: 1024px;
             margin: 0 auto;
             overflow: visible;
+
+            @include mobile {
+                padding: 0 1ex;
+            }
         }
     }
 
