@@ -43,7 +43,7 @@
     onMount(() => {
         if (LAUNCHED) {
             loadContestState();
-            refreshTimer = setInterval(loadContestState, 120e3);
+            refreshTimer = setInterval(loadContestState, 60e3);
         }
     });
 
@@ -101,6 +101,8 @@
 
     async function loadContestState(): Promise<void> {
         setSeasons(await fetchContestState(publicClient));
+        // HACK: Need to do this to trigger updates for other subscribers.
+        $seasons;
     }
 
     function toggleMusic() {
