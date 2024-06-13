@@ -52,11 +52,14 @@
             }
             const sortedResults = results
               .map((r: any) => ({ ...r, time: new Date(r.time) }))
-              .sort((a: any, b: any) => -cmpDate(a.time, b.time));
-            let marketDayCounter = 0;
+              .sort((a: any, b: any) => -cmpDate(a.time, b.time)) as any[];
+            const totalMarketDays = sortedResults.reduce(
+              (a, r) => r.type === 'scrimmage' ? a + 1 : a, 0,
+            );
+            let marketDayCounter = totalMarketDays ;
             for (const r of sortedResults) {
               if (r.type === 'scrimmage') {
-                r.marketDayIndex = marketDayCounter++;
+                r.marketDayIndex = --marketDayCounter;
               }
             }
             return sortedResults;
@@ -129,7 +132,10 @@
         Grand Faire
         {/if}
       </h3>
-      <a href={`${base}/tournament?season=${seasonIdx+1}&id=${tournament.id}`}>&gt;&gt; View tournament</a>
+      <a href={`${base}/tournament?season=${seasonIdx+1}&id=${tournament.id}${
+        ''}${tournament.marketDayIndex !== undefined ? `&idx=${tournament.marketDayIndex}` : ''}`}>
+        &gt;&gt; View tournament
+      </a>
       <div>
         Time: {tournament.time.toLocaleString()}
       </div>

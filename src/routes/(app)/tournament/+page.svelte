@@ -30,6 +30,7 @@ import { page } from "$app/stores";
     }
 
     let tournamentId: string | undefined;
+    let tournamentIdx: number | undefined;
     let seasonIdx: number | undefined;
     let data: BusyState<TournamentData>;
     const dataAwait = createBusy<TournamentData>(r => data = r);
@@ -65,6 +66,10 @@ import { page } from "$app/stores";
     function parseQueryParams(params: URLSearchParams): void {
       tournamentId = params.get('id') ?? undefined;
       seasonIdx = Number(params.get('season') ?? '1') - 1;
+      tournamentIdx = Number(params.get('idx') ?? '1') - 1;
+      if (isNaN(tournamentIdx)) {
+        tournamentIdx = undefined;
+      }
     }
 </script>
 
@@ -95,7 +100,12 @@ import { page } from "$app/stores";
   {:else if data}
   <Lede>
     <h1>
-      {#if data.type == 'scrimmage'}Market Day{:else}Grand Faire{/if} Summary
+      {#if data.type == 'scrimmage'}
+      Market Day {#if tournamentIdx !== undefined}{tournamentIdx + 1}{/if}
+      {:else}
+      Grand Faire
+      {/if}
+      Summary
     </h1>
     <div>
       <a href={`${base}/season?season=${data.season+1}`}>Season {data.season + 1}</a>

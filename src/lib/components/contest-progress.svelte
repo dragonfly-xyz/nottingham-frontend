@@ -11,7 +11,7 @@
     import CatSpinner from "$lib/components/cat-spinner.svelte";
     import { base } from "$app/paths";
     import { createBusy, type BusyState } from "$lib/kit";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import Player from "./player.svelte";
 
     interface TournamentResult {
@@ -26,11 +26,25 @@
     let loadState: BusyState;
     const loadAwait = createBusy(r => loadState = r);
     let tournamentsBySeason: Record<number, TournamentResult[]> = {};
+    let refreshTimer: NodeJS.Timeout | null = null;
     export let maxTournaments = 5;
 
-    onMount(async () => {
-        tournamentsBySeason = await loadAwait(fetchTournaments);
+    onMount(() => {
+        refreshTimer = setInterval(async () => {
+            // Silent refresh on interval.
+            tournamentsBySeason = await fetchTournaments();
+        }, 60e3);
+        (async () => {
+            tournamentsBySeason = await loadAwait(fetchTournaments());
+        })();
     });
+
+    onDestroy(() => {
+        if (refreshTimer) {
+            clearInterval(refreshTimer);
+            refreshTimer = null;
+        }
+    })
 
     async function fetchTournaments(): Promise<typeof tournamentsBySeason> {
         const resp = await fetch(`${PUBLIC_DATA_URL}/results`);

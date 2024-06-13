@@ -224,6 +224,9 @@
                     fn: 'winner', args: [idx],
                 })),
             });
+            // TODO: for new version of contract.
+            // winningSeasons = winningSeasons
+            //     .filter((_, i) => winnersAndPrizes[i][2] !== 0n);
             winningSeasons = winningSeasons
                 .filter((_, i) => winnersAndPrizes[i][1] !== 0n);
             if (winningSeasons.length === 0) {
