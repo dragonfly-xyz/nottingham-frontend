@@ -82,7 +82,7 @@
     .matches-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 0 4ex;
+      gap: 0 6ex;
 
       .match {
         width: fit-content;
@@ -102,6 +102,10 @@
     font-size: 0.8em;
   }
 
+  .date {
+    float: right;
+  }
+
 </style>
 
 <Page title="Bracket Details">
@@ -115,13 +119,17 @@
     <h1>
       Bracket {data.bracket + 1}
     </h1>
-    <p>
-      <a href={`${base}/tournament?id=${data.tournamentId}&season=${data.season + 1}`}>
+    <div class="date">{data.time.toLocaleDateString()}</div>
+    <div>
+      <a href={`${base}/season?&season=${data.season + 1}`}>
         Season {data.season + 1}
-        {#if data.type == 'scrimmage'}Market Day{:else}Grand Faire{/if}
-        {data.time.toLocaleDateString()}
       </a>
-    </p>
+    </div>
+    <div>
+      <a href={`${base}/tournament?id=${data.tournamentId}&season=${data.season + 1}`}>
+        {#if data.type == 'scrimmage'}Market Day{:else}Grand Faire{/if}
+      </a>
+    </div>
   </Lede>
   <section>
     <h2>Bracket Ranking</h2>

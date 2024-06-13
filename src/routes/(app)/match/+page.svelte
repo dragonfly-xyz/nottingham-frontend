@@ -423,6 +423,10 @@
       }
     }
   }
+
+  .date {
+    float: right;
+  }
 </style>
 
 <Page title="Match Details">
@@ -436,11 +440,15 @@
     <h1>
       Match {#if matchIdx !== undefined}{matchIdx + 1}{/if}
     </h1>
+    <div class="date">{data.time.toLocaleDateString()}</div>
+    <div>
+      <a href={`${base}/season?season=${data.season + 1}`}>
+        Season {data.season + 1}
+      </a>
+    </div>
     <div>
       <a href={`${base}/tournament?id=${data.tournamentId}&season=${data.season + 1}`}>
-        Season {data.season + 1}
         {#if data.type == 'scrimmage'}Market Day{:else}Grand Faire{/if}
-        {data.time.toLocaleDateString()}
       </a>
     </div>
     <div>

@@ -6,6 +6,7 @@
     import Lede from "$lib/components/lede.svelte";
     import Page from "$lib/components/page.svelte";
     import Player from "$lib/components/player.svelte";
+    import { SeasonState } from "$lib/contest";
     import { createBusy, type BusyState } from "$lib/kit";
     import {
         formatScore,
@@ -73,7 +74,20 @@
 
 <style lang="scss">
   @use '../../../lib/styles/global.scss';
+
+  .grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0 6ex;
+
+    h3 {
+      margin-bottom: 0.25em;
+      border-bottom: 1px solid #777;
+    }
+  }
 </style>
+
 <Page title="Season Details">
   {#if data instanceof Promise}
   <div class="loading"><CatSpinner /></div>
@@ -84,6 +98,11 @@
   <Lede>
     <h1>
       Season {seasonIdx + 1}
+      {#if $seasons[seasonIdx]?.state === SeasonState.Revealed}
+      Summary
+      {:else}
+      Progress
+      {/if}
     </h1>
     <div>
       Started on {$seasons[seasonIdx].startTime.toLocaleDateString()}
@@ -99,33 +118,36 @@
     </div>
     {/if}
   </Lede>
-  {#each data as tournament, i}
-  <div>
-    <h2>
-      {#if tournament.type === 'scrimmage'}
-      Market Day {#if tournament.marketDayIndex !== undefined}{tournament.marketDayIndex + 1}{/if}
-      {:else}
-      Grand Faire
-      {/if}
-    </h2>
-    <a href={`${base}/tournament?season=${seasonIdx+1}&id=${tournament.id}`}>&gt;&gt; View tournament</a>
+  <h2>Tournaments</h2>
+  <div class="grid">
+    {#each data as tournament, i}
     <div>
-      Time: {tournament.time.toLocaleString()}
+      <h3>
+        {#if tournament.type === 'scrimmage'}
+        Market Day {#if tournament.marketDayIndex !== undefined}{tournament.marketDayIndex + 1}{/if}
+        {:else}
+        Grand Faire
+        {/if}
+      </h3>
+      <a href={`${base}/tournament?season=${seasonIdx+1}&id=${tournament.id}`}>&gt;&gt; View tournament</a>
+      <div>
+        Time: {tournament.time.toLocaleString()}
+      </div>
+      <div>
+        Players: {tournament.rankings.length}
+      </div>
+      <h4>Top {Math.min(tournament.rankings.length, 10)}</h4>
+      <ol>
+        {#each tournament.rankings.slice(0, 10) as player, i (player.address)}
+        <li>
+          <Player name={player.name} />:
+          {formatScore(player.score)}
+          {#if i === 0}🏆️{/if}
+        </li>
+        {/each}
+      </ol>
     </div>
-    <div>
-      Players: {tournament.rankings.length}
-    </div>
-    <h3>Top {Math.min(tournament.rankings.length, 10)}</h3>
-    <ol>
-      {#each tournament.rankings.slice(0, 10) as player, i (player.address)}
-      <li>
-        <Player name={player.name} />:
-        {formatScore(player.score)}
-        {#if i === 0}🏆️{/if}
-      </li>
-      {/each}
-    </ol>
+    {/each}
   </div>
-  {/each}
   {/if}
 </Page>

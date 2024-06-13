@@ -71,6 +71,18 @@ import { page } from "$app/stores";
 <style lang="scss">
   @use '../../../lib/styles/global.scss';
 
+  .grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6ex;
+
+    h3 {
+      margin-bottom: 0.25em;
+      border-bottom: 1px solid #777;
+    }
+  }
+
 </style>
 
 
@@ -86,7 +98,7 @@ import { page } from "$app/stores";
       {#if data.type == 'scrimmage'}Market Day{:else}Grand Faire{/if} Summary
     </h1>
     <div>
-      Season: {data.season + 1}
+      <a href={`${base}/season?season=${data.season+1}`}>Season {data.season + 1}</a>
     </div>
     <div>
       Time: {data.time.toLocaleDateString()} {data.time.toLocaleTimeString()}
@@ -103,34 +115,40 @@ import { page } from "$app/stores";
       {/each}
     </ol>
   </div>
-  <div>
-    {#each data.brackets as bracket (bracket.idx)}
-    <div>
+  <section>
+    <h2>Brackets</h2>
+    <div class="grid">
+      {#each data.brackets as bracket (bracket.idx)}
       <div>
-        <h2>Bracket {bracket.idx + 1}</h2>
+        <div>
+          <h3>Bracket {bracket.idx + 1}</h3>
+        </div>
+        <div>
+          Players: {bracket.rankings.length}
+        </div>
+        <div>
+          Matches: {bracket.matches.length}
+          ({bracket.matches.length / Math.ceil(bracket.rankings.length / 4)}pp)
+        </div>
+        <div>
+          (<a href={`${base}/bracket?tournament=${data.id}&season=${data.season + 1}&bracket=${bracket.idx + 1}`}><!--
+          -->view matches<!--
+          --></a>)
+        </div>
+        <div>
+          <h4>Bracket Ranking</h4>
+          <ol>
+            {#each bracket.rankings as player (player.address)}
+            <li>
+              <Player name={player.name} />:
+              {formatScore(player.score)}
+            </li>
+            {/each}
+          </ol>
+        </div>
       </div>
-      <div>
-        Players: {bracket.rankings.length},
-        Matches: {bracket.matches.length}
-        ({bracket.matches.length / Math.ceil(bracket.rankings.length / 4)}pp)
-        &nbsp;
-        (<a href={`${base}/bracket?tournament=${data.id}&season=${data.season + 1}&bracket=${bracket.idx + 1}`}><!--
-        -->view matches<!--
-        --></a>)
-      </div>
-      <div>
-        <h3>Bracket Ranking</h3>
-        <ol>
-          {#each bracket.rankings as player (player.address)}
-          <li>
-            <Player name={player.name} />:
-            {formatScore(player.score)}
-          </li>
-          {/each}
-        </ol>
-      </div>
+      {/each}
     </div>
-    {/each}
-  </div>
+  </section>
   {/if}
 </Page>
