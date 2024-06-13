@@ -91,7 +91,7 @@ button:not(.custom) {
     }
 }
 
-input:not([type]), input[type='text'], textarea {
+input:not([type]), input[type='text'], input[type='email'], textarea {
     background: none;
     border: none;
     border-image: url('/text-input-border.png') 15% 22.5% / 0.5em 1.75ex round;

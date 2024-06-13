@@ -14,7 +14,12 @@
     } from "viem";
     import Lede from "$lib/components/lede.svelte";
     import CatSpinner from "$lib/components/cat-spinner.svelte";
-    import { CONTEST_ADDRESS, readContestContract, waitForTxSuccess, writeContestContract } from "$lib/contest";
+    import {
+        CONTEST_ADDRESS,
+        readContestContract,
+        waitForTxSuccess,
+        writeContestContract,
+    } from "$lib/contest";
     import { createBusy, type BusyState } from "$lib/kit";
     import { base } from "$app/paths";
 
@@ -45,8 +50,12 @@
     } | null = null;
     let inviteCode: string | null = null;
     let playerName: string | null = null;
+    let email: string | null = null;
+    let twitter: string | null = null;
     let termsAgreed: boolean = false;
     let adultAgreed: boolean = false;
+    let talentAgreed: boolean = true;
+    let singletonAgreed: boolean = false;
 
     $: {
         if (registered && playerName) {
@@ -97,6 +106,7 @@
             }
             const user = await resp.json();
             authInfo = { userId: user.userId, email: user.email, hmac: user.hmac };
+            email = authInfo.email;
             playerName = (user.name as string).toLowerCase().replaceAll(/[^a-z0-9_]/g,'');
         })());
     });
@@ -143,6 +153,9 @@
                         expiry,
                         signature,
                         inviteCode: inviteCode ?? undefined,
+                        email,
+                        talentOptIn: talentAgreed,
+                        twitter: twitter ?? undefined,
                     }),
                 });
                 if (!resp.ok) {
@@ -215,6 +228,10 @@
             margin-top: 1em;
         }
 
+        button {
+            display: block;
+            margin: 0 auto;
+        }
     }
 
     .register-form {
@@ -234,10 +251,11 @@
             @include mobile {
                 flex-direction: column;
             }
-        }
 
-        > div:last-child {
-            align-self: end;
+            .field {
+                display: flex;
+                flex-direction: column;
+            }
         }
     }
 
@@ -246,11 +264,9 @@
 <Page title="Register Merchant">
     <Lede>
         <h1>Registration</h1>
-        <p>
-            This game is strictly for nerds so players must have a valid Github account to register. We may need to reach out to you about the contest (look for an "@dragonfly.xyz" email), so please make sure the email attached to the account is correct and reachable.
-        </p>
     </Lede>
-    {#if !authInfo}
+    <section />
+    {#if !authInfo && !(busyState instanceof Promise)}
     <section>
         <form class="auth-form" on:submit|preventDefault={() => login()}>
             <iframe src={`${base}/terms/rules.html`} title="rules" />
@@ -262,7 +278,7 @@
                         disabled={busyState instanceof Promise}
                     />
                     <label for="terms-agree">
-                        By registering, you agree to our
+                        I agree to the
                         <a href={`${base}/rules`} target="_blank">Contest Rules</a> and
                         <a href={`${base}/privacy`} target="_blank">Privacy Agreement</a>.
                     </label>
@@ -274,52 +290,101 @@
                         disabled={busyState instanceof Promise}
                     />
                     <label for="adult-agree">
-                        By registering, you confirm that you are at least 18 years of age.
+                        I confirm that I am at least 18 years of age.
+                    </label>
+                </div>
+                <div>
+                    <input
+                        type="checkbox" bind:checked={singletonAgreed}
+                        id="singleton-agree"
+                        disabled={busyState instanceof Promise}
+                    />
+                    <label for="singleton-agree">
+                        I agree to compete under only a single player account, whether individually or as part of a team.
+                    </label>
+                </div>
+                <div>
+                    <input
+                        type="checkbox" bind:checked={talentAgreed}
+                        id="talent-agree"
+                        disabled={busyState instanceof Promise}
+                    />
+                    <label for="talent-agree">
+                        Please reach out to me about opportunities in the Dragonfly portfolio.
                     </label>
                 </div>
             </div>
-            <p>
+            <div>
+                <p>
+                    This game is strictly for nerds 🤓! &nbsp;Players must have a qualifying Github account to register.
+                </p>
                 <button
-                    type="submit"
-                    disabled={busyState instanceof Promise || !termsAgreed || !adultAgreed}
-                    aria-busy={busyState instanceof Promise}
+                type="submit"
+                disabled={busyState instanceof Promise
+                    || !termsAgreed || !adultAgreed || !singletonAgreed}
+                aria-busy={busyState instanceof Promise}
                 >
-                    Authenticate on Github
+                Connect to Github
                 </button>
-            </p>
+            </div>
         </form>
     </section>
-    {:else}
+    {:else if authInfo}
     {#if $wallet}
     <section>
         <p>
-            The connected wallet address (<em>{$wallet.address}</em>) will <em>publicly</em> identify your merchant onchain and will be used to make code submissions and claim prizes. You can authorize other addresses to submit code on your behalf, but only this address can ever claim prizes.
+            The connected wallet address ({$wallet.address}) will <em>publicly</em> identify your merchant and will be used to make code submissions and claim prizes. You can authorize other addresses to submit code on your behalf, but only this address can ever claim prizes. <em>You cannot change it afterwards</em>.
         </p>
         <p>
-            This wallet will also need to be supplied with a small amount of ETH on the {$wallet.chain.name} network to complete registration and to make code submissions.{#if $wallet.chain.id === 324}  You can bridge ETH from Ethereum to {$wallet.chain.name} <a href="https://portal.zksync.io/bridge/" target="_blank">here</a>.{/if}
+            We are required to collect tax information from winners before they are able to claim their prize. Please provide an active email address where we can reach you in the event that you are declared a winner. Be on the lookout for a "@dragonfly.xyz" email.
         </p>
     </section>
     <section>
         <form class="register-form" on:submit|preventDefault={() => register()}>
             <div class="inputs">
-                {#if !INVITE_ONLY}
-                <div>
+                {#if INVITE_ONLY}
+                <div class="field">
                     <label for="invite-code">Invite Code</label>
                     <input placeholder="Invite code" bind:value={inviteCode} id="invite-code" />
                 </div>
                 {/if}
-                <div>
-                    <label for="name">Player Name</label>
+                <div class="field">
+                    <label for="name">Player Name*</label>
                     <input
                         id="name"
-                        placeholder="Player name"
+                        placeholder="My_merchant"
                         bind:value={playerName}
                         pattern="^[a-z0-9_]+$"
                         minlength="3"
                         maxlength="32"
                         required />
                 </div>
+                <div class="field">
+                    <label for="email">Email*</label>
+                    <input
+                        id="email"
+                        placeholder="Email"
+                        bind:value={email}
+                        type="email"
+                        minlength="3"
+                        maxlength="96"
+                        required
+                         />
+                </div>
+                <div class="field">
+                    <label for="twitter">Twitter/X handle</label>
+                    <input
+                        id="twitter"
+                        placeholder="(optional)"
+                        bind:value={twitter}
+                        minlength="3"
+                        maxlength="96"
+                         />
+                </div>
             </div>
+            <p>
+                Your wallet will need to be supplied with a small amount of ETH on the {$wallet.chain.name} network to complete registration and to make code future submissions.{#if $wallet.chain.id === 324}  You can quickly bridge ETH from Ethereum to {$wallet.chain.name} <a href="https://portal.zksync.io/bridge/" target="_blank">here</a>.{/if}
+            </p>
             <div>
                 <button
                     type="submit"
