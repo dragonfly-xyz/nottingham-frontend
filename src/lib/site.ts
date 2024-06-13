@@ -24,7 +24,7 @@ export const INVITE_ONLY = !!publicEnv.PUBLIC_INVITE_ONLY;
 export const LAUNCH_TIME = new Date(publicEnv.PUBLIC_LAUNCH_TIME ?? 0);
 export const LAUNCHED = LAUNCH_TIME.getTime() < Date.now();
 export const SCHEDULE = (publicEnv.PUBLIC_SCHEDULE ? publicEnv.PUBLIC_SCHEDULE.split(',') : []).map(d => new Date(d));
-export const SCHEDULED_PRIZES = (publicEnv.PUBLIC_SCHEDULED_PRIZES ? publicEnv.PUBLIC_SCHEDULED_PRIZES.split(',') : []);
+export const SCHEDULED_PRIZES = (publicEnv.PUBLIC_SCHEDULED_PRIZES ? publicEnv.PUBLIC_SCHEDULED_PRIZES.split(',').map(v => Number(v)) : []);
 
 export interface ScoredPlayer {
     name: string;

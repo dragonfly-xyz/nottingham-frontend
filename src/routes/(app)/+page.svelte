@@ -148,6 +148,9 @@
         {#if SCHEDULE.length}
         <div id="timeline">
             <h3><a href="#timeline" class="inherit">Timeline</a></h3>
+            <p>
+                A total of ${SCHEDULED_PRIZES.reduce((a, v) => a + v).toLocaleString()} will be awarded across {SCHEDULED_PRIZES.length} season ending tournaments.
+            </p>
             <div class="events">
                 {#if LAUNCH_TIME.getTime() != 0}
                 <div class="event">
