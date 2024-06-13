@@ -129,7 +129,7 @@
     <div class="season">
         <h3>
             <img class="leaf" src={`${base}/leaf.png`} alt="season" />
-            <a href={`/season?season=${szn.idx + 1}`}>Season {szn.idx + 1}</a>
+            <a href={`${base}/season?season=${szn.idx + 1}`}>Season {szn.idx + 1}</a>
             <span class="smaller">
                 {#if szn.closedTime}
                 (Ended on {szn.closedTime.toLocaleDateString()})
@@ -169,7 +169,7 @@
             {/each}
             {#if tournamentsBySeason[szn.idx].length > maxTournaments}
             <div class="more">
-                <a href={`/season?season=${szn.idx + 1}`}>{tournamentsBySeason[szn.idx].length - maxTournaments} more tournaments...</a>
+                <a href={`${base}/season?season=${szn.idx + 1}`}>{tournamentsBySeason[szn.idx].length - maxTournaments} more tournaments...</a>
             </div>
             {/if}
             {:else}

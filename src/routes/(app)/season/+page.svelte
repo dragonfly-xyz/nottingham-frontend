@@ -108,7 +108,7 @@
       Grand Faire
       {/if}
     </h2>
-    <a href={`/tournament?season=${seasonIdx+1}&id=${tournament.id}`}>&gt;&gt; View tournament</a>
+    <a href={`${base}/tournament?season=${seasonIdx+1}&id=${tournament.id}`}>&gt;&gt; View tournament</a>
     <div>
       Time: {tournament.time.toLocaleString()}
     </div>
