@@ -45,6 +45,7 @@
     } | null = null;
     let isWalletOperator = false;
     let playerIsActive: boolean = false;
+    let playerCanClaim: boolean = false;
     let playerPrize: bigint = 0n;
     let currentSeason: SeasonInfo | null = null;
     let profileUrl: string | null = null;
@@ -74,10 +75,11 @@
         if (userId.startsWith('github:')) {
             const resp = await fetch(`https://api.github.com/user/${userId.slice(7)}`);
             const data = await resp.json();
-            profileUrl = `https://github.com/${data.login}`;
+            if (data.login) {
+                profileUrl = `https://github.com/${data.login}`;
+            }
         }
     }
-
 
     async function loadPlayerFromSearchParams(params: URLSearchParams): Promise<void> {
         let searchAddress: Address | null = params.get('address') as Address ?? null;
@@ -95,16 +97,18 @@
         walletAddress: Address | undefined | null,
     ): Promise<void> {
         walletAddress = walletAddress ?? randomHex(20);
-        const [isOperator, submittedCodeHash] = await
-            multiReadContestContract<[boolean, Hex]>({
+        const [isOperator, submittedCodeHash, canPlayerClaim] = await
+            multiReadContestContract<[boolean, Hex, boolean]>({
                 client: publicClient,
                 calls: [
                     { fn: 'operators', args: [playerAddress, walletAddress]},
                     { fn: 'playerCodeHash', args: [seasonIdx, playerAddress] },
+                    { fn: 'canPlayerClaim', args: [playerAddress] },
                 ],
             });
         isWalletOperator = isOperator || walletAddress === playerAddress;
         playerIsActive = submittedCodeHash !== zeroHash;
+        playerCanClaim = canPlayerClaim;
     }
 
     async function populatePlayerStats(
@@ -218,17 +222,14 @@
                 return;
             }
             const [...winnersAndPrizes] = await multiReadContestContract
-                <Array<[Address, bigint]>>({
+                <Array<[Address, bigint, bigint]>>({
                 client: $wallet.client,
                 calls: winningSeasons.map(idx => ({
                     fn: 'winner', args: [idx],
                 })),
             });
-            // TODO: for new version of contract.
-            // winningSeasons = winningSeasons
-            //     .filter((_, i) => winnersAndPrizes[i][2] !== 0n);
             winningSeasons = winningSeasons
-                .filter((_, i) => winnersAndPrizes[i][1] !== 0n);
+                .filter((_, i) => winnersAndPrizes[i][2] !== 0n);
             if (winningSeasons.length === 0) {
                 return;
             }
@@ -369,6 +370,7 @@
     <section class="stats">
         {#if playerPrize > 0n && $wallet?.address == playerStats.playerAddress}
         <div class="alert">
+            {#if playerCanClaim}
             <p>
                 You have {formatEther(playerPrize)} ETH in unclaimed prizes!
                 <button
@@ -379,6 +381,11 @@
                     Claim Prize
                 </button>
             </p>
+            {:else}
+            <p>
+                You have {formatEther(playerPrize)} ETH in unclaimed prizes! Look for an email from a "@dragonfly.xyz" address in the next few days with further instructions on how to claim.
+            </p>
+            {/if}
         </div>
         {/if}
         <h2>Performance History</h2>

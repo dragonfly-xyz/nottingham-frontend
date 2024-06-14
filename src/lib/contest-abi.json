@@ -8,7 +8,7 @@
         "internalType": "address"
       },
       {
-        "name": "retirer_",
+        "name": "admin_",
         "type": "address",
         "internalType": "address"
       },
@@ -16,6 +16,11 @@
         "name": "registrar_",
         "type": "address",
         "internalType": "address"
+      },
+      {
+        "name": "recoveryAddress_",
+        "type": "address",
+        "internalType": "address payable"
       }
     ],
     "stateMutability": "nonpayable"
@@ -23,6 +28,51 @@
   {
     "type": "receive",
     "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "admin",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "allowClaim",
+    "inputs": [
+      {
+        "name": "player",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "canPlayerClaim",
+    "inputs": [
+      {
+        "name": "player",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "canClaim",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -94,8 +144,8 @@
     "outputs": [
       {
         "name": "prize",
-        "type": "uint256",
-        "internalType": "uint256"
+        "type": "uint96",
+        "internalType": "uint96"
       }
     ],
     "stateMutability": "view"
@@ -149,7 +199,7 @@
         "internalType": "bytes[]"
       }
     ],
-    "stateMutability": "payable"
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -252,6 +302,32 @@
   },
   {
     "type": "function",
+    "name": "recoveryAddress",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address payable"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "refund",
+    "inputs": [
+      {
+        "name": "amount",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "register",
     "inputs": [
       {
@@ -315,12 +391,51 @@
   },
   {
     "type": "function",
+    "name": "replaceAdmin",
+    "inputs": [
+      {
+        "name": "newAdmin",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "replaceHost",
+    "inputs": [
+      {
+        "name": "newHost",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "replaceRegistrar",
     "inputs": [
       {
         "name": "newRegistrar",
         "type": "address",
         "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "restore",
+    "inputs": [
+      {
+        "name": "seasonIdx",
+        "type": "uint32",
+        "internalType": "uint32"
       }
     ],
     "outputs": [],
@@ -338,19 +453,6 @@
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "retirer",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -428,7 +530,7 @@
       }
     ],
     "outputs": [],
-    "stateMutability": "payable"
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -496,7 +598,7 @@
   },
   {
     "type": "function",
-    "name": "unclaimedPrize",
+    "name": "totalUnclaimedPrize",
     "inputs": [],
     "outputs": [
       {
@@ -524,12 +626,36 @@
         "internalType": "address"
       },
       {
+        "name": "prize_",
+        "type": "uint96",
+        "internalType": "uint96"
+      },
+      {
         "name": "unclaimedPrize_",
         "type": "uint96",
         "internalType": "uint96"
       }
     ],
     "stateMutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "AdminReplaced",
+    "inputs": [
+      {
+        "name": "oldAdmin",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "newAdmin",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
   },
   {
     "type": "event",
@@ -581,6 +707,25 @@
   },
   {
     "type": "event",
+    "name": "HostReplaced",
+    "inputs": [
+      {
+        "name": "oldHost",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "newHost",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "OperatorSet",
     "inputs": [
       {
@@ -606,6 +751,19 @@
   },
   {
     "type": "event",
+    "name": "PlayerAllowedToClaim",
+    "inputs": [
+      {
+        "name": "player",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "PrizeClaimed",
     "inputs": [
       {
@@ -619,6 +777,25 @@
         "type": "address",
         "indexed": true,
         "internalType": "address"
+      },
+      {
+        "name": "prize",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "PrizeRestored",
+    "inputs": [
+      {
+        "name": "season",
+        "type": "uint32",
+        "indexed": true,
+        "internalType": "uint32"
       },
       {
         "name": "prize",
@@ -784,6 +961,11 @@
   },
   {
     "type": "error",
+    "name": "InsufficientBalanceError",
+    "inputs": []
+  },
+  {
+    "type": "error",
     "name": "InvalidCodeHashError",
     "inputs": []
   },
@@ -800,6 +982,11 @@
   {
     "type": "error",
     "name": "InvalidPlayerError",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotAllowedToClaimError",
     "inputs": []
   },
   {
@@ -835,6 +1022,11 @@
   {
     "type": "error",
     "name": "SeasonNotClosedError",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "TooSoonError",
     "inputs": []
   }
 ]
