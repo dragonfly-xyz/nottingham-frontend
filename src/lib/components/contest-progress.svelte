@@ -85,7 +85,6 @@
         if (dt > ONE_MINUTE_MS * 2) {
             return `${Math.round(dt / ONE_HOUR_MS)} minutes`;
         }
-        console.log(when, dt);
         return `a few seconds`;
     }
 </script>
@@ -139,7 +138,9 @@
     <CatSpinner failed />
     <div class="error">{getFriendlyErrorMsg(loadState)}</div>
     {:else if $seasons.length > 0}
-    {#each $seasons.slice().sort((a, b) => cmpDate(b.startTime, a.startTime)) as szn (szn.idx)}
+    {#each $seasons
+        .filter(s => !s.isTerminal).slice()
+        .sort((a, b) => cmpDate(b.startTime, a.startTime)) as szn (szn.idx)}
     <div class="season">
         <h3>
             <img class="leaf" src={`${base}/leaf.png`} alt="season" />

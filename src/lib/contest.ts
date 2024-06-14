@@ -164,6 +164,7 @@ export interface SeasonInfo {
     closedBlock: number | null; 
     startTime: Date; 
     closedTime: Date | null;
+    isTerminal: boolean;
 }
 
 export interface ChainEvent {
@@ -203,6 +204,8 @@ export async function fetchContestState(
                 unclaimedPrize: 0n,
                 privateKey: null,
                 publicKey: event.publicKey,
+                isTerminal: seasons[seasons.length - 1]?.publicKey ===
+                    event.publicKey,
             });
         } else if (event.eventName === 'SeasonClosed') {
             const season = seasons[event.season];

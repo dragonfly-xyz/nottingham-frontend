@@ -420,7 +420,9 @@
         {/if}
     </section>
     <section class="tools">
-        {#if !currentSeason || currentSeason.state !== SeasonState.Started}
+        {#if !currentSeason
+            || currentSeason.state !== SeasonState.Started
+            || currentSeason.isTerminal}
         <div>Current season is closed and cannot accept new submissions at this time.</div>
         {:else if isWalletOperator}
         <section>
