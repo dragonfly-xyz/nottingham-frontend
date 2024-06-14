@@ -199,14 +199,13 @@
                 <a href="https://github.com/dragonfly-xyz/nottingham-contracts" target="_blank">Game contracts</a> (start here!)
                 <ul>
                     <li>A <a href="https://book.getfoundry.sh" target="_blank">foundry</a> development environment containing all the core game logic, sample players, and a local match runner.</li>
-                    <li>Here you can find much more technical detail about how the game logic works.</li>
                 </ul>
             </li>
             <li>
                 <a href={`${chain.blockExplorers?.default.url}address/${CONTEST_ADDRESS}`} target="_blank">Contest contract</a>
                 <ul>
                     <li>
-                        The deployed, onchain component of the contest, which handles registration, submissions, and payouts.
+                        The onchain component of the contest, which handles registration, submissions, and payouts.
                     </li>
                 </ul>
             </li>
