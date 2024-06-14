@@ -149,7 +149,7 @@
         <div id="timeline">
             <h3><a href="#timeline" class="inherit">Timeline</a></h3>
             <p>
-                A total of ${SCHEDULED_PRIZES.reduce((a, v) => a + v).toLocaleString()} will be awarded across {SCHEDULED_PRIZES.length} season ending tournaments.
+                A total of ${SCHEDULED_PRIZES.reduce((a, v) => a + v).toLocaleString()}* will be awarded across {SCHEDULED_PRIZES.length} season ending tournaments.
             </p>
             <div class="events">
                 {#if LAUNCH_TIME.getTime() != 0}
@@ -208,6 +208,13 @@
                     <li>
                         The deployed, onchain component of the contest, which handles registration, submissions, and payouts.
                     </li>
+                </ul>
+            </li>
+            {:else}
+            <li>
+                <a href="#resources">Game contracts</a>
+                <ul>
+                    Will be revealed at launch!
                 </ul>
             </li>
             {/if}
