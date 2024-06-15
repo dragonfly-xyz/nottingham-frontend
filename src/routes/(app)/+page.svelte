@@ -233,7 +233,6 @@
             </li>
         </ul>
     </section>
-    {#if LAUNCHED}
     <section>
         <h2>Legal Disclosures</h2>
         <ul>
@@ -245,5 +244,4 @@
             </li>
         </ul>
     </section>
-    {/if}
 </Page>
