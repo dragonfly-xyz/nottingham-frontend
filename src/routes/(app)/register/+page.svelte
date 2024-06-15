@@ -45,7 +45,7 @@
     let authCode: string | null = null;
     let authInfo: {
         userId: string;
-        email: string;
+        email: string | null;
         hmac: string;
     } | null = null;
     let inviteCode: string | null = null;
