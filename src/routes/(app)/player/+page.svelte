@@ -179,6 +179,9 @@
             if (!code.startsWith('0x')) {
                 code = `0x${code}`;
             }
+            if (!/^0x[a-f0-9]$/i.test(code)) {
+                throw new UserError('Invalid bytecode hex.');
+            }
             const hexCode = code as Hex;
             const codeHash = keccak256(hexCode);
             const encrypted = await encryptPlayerCode(
