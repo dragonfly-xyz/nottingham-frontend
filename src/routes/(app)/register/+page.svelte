@@ -336,7 +336,7 @@
             The connected wallet address ({$wallet.address}) will <em>publicly</em> identify your merchant and will be used to make code submissions and claim prizes. You can authorize other addresses to submit code on your behalf, but only this address can ever claim prizes. <em>You cannot change it afterwards</em>.
         </p>
         <p>
-            We are required to collect tax information from winners before they are able to claim their prize. Please provide an active email address where we can reach you in the event that you are declared a winner. Be on the lookout for a "@dragonfly.xyz" email.
+            We are required to KYC and potentially collect tax information from winners before they are able to claim their prize. Please provide an active email address where we can reach you in the event that you are declared a winner. Be on the lookout for a "@dragonfly.xyz" email.
         </p>
     </section>
     <section>
