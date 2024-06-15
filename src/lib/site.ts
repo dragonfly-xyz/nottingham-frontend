@@ -56,6 +56,11 @@ export const CHAIN_BY_ID = {
 export function createPublicClient(): PublicClient {
     const transport = http(PUBLIC_RPC_URL);
     const chain = CHAIN_BY_ID[Number(PUBLIC_CHAIN_ID) as keyof typeof CHAIN_BY_ID];
+    if (chain.id === 324) {
+        const overrideExplorers = [{ name: 'default', url: "https://explorer.zksync.io/" }];
+        (overrideExplorers as any).default = overrideExplorers[0];
+        chain.blockExplorers = overrideExplorers as any;
+    }
     if (!chain) {
         throw new Error(`Unsupported chain: ${PUBLIC_CHAIN_ID}`);
     }

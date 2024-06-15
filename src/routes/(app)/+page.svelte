@@ -133,7 +133,7 @@
             On the last day of the season, a single "Grand Faire" tournament is held. The Grand Faire DOES award prizes (in ETH) to the winner, and will also consist of more matches for certainty. The Grand Faire prize increases with each successive season, as players naturally become more sophisticated with time.
         </p>
         <p>
-            The contest is free to join, but you will need a small amount of ETH on <a href={Object.values(chain.blockExplorers ?? {})[0].url} target="_blank">{chain.name}</a> to cover gas for registration, submissions, and to claim any prizes.
+            The contest is free to join, but you will need a small amount of ETH on <a href={chain.blockExplorers?.default.url} target="_blank">{chain.name}</a> to cover gas for registration, submissions, and to claim any prizes.
         </p>
         <h3 id="tournaments"><a href="#tournaments" class="inherit">Tournaments</a></h3>
         <p>
