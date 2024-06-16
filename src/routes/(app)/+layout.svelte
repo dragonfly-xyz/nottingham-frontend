@@ -177,6 +177,7 @@
             display: flex;
             justify-content: right;
             flex-wrap: wrap;
+            flex: 1 0 auto;
 
             @include mobile {
                 align-self: center;
@@ -187,7 +188,6 @@
                 margin: 0 0.5ex;
             }
         }
-
 
         .wallet-status {
             vertical-align: top;

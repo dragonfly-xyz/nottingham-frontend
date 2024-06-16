@@ -106,7 +106,7 @@
         @include mobile {
             display: block;
             max-width: none;
-            width: 100%;
+            // width: 100%;
         }
 
         li {
@@ -124,7 +124,7 @@
             @include mobile {
                 display: flex;
                 flex-direction: row;
-                width: 100%;
+                // width: 100%;
                 flex-wrap: wrap;
                 gap: 1ex;
 
@@ -137,9 +137,12 @@
                 }
     
                 > .joined {
-                    text-align: end;
+                    margin-left: 4ex;
                     flex: 1 0 100%;
-    
+                }
+
+                &:not(:last-child) {
+                    margin-bottom: 1em;
                 }
             }
         }
