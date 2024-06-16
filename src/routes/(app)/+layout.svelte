@@ -133,7 +133,7 @@
         > .left {
             display: flex;
             align-self: start;
-            justify-content: right;
+            justify-content: center;
             flex-wrap: wrap;
 
             @include mobile {

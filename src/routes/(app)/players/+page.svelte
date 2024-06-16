@@ -102,18 +102,52 @@
         max-width: min-content;
         padding-inline-start: 0;
         display: table;
+
+        @include mobile {
+            display: block;
+            max-width: none;
+            width: 100%;
+        }
+
         li {
             display: table-row;
 
-            > * {
-                display: table-cell;
-                padding: 0.1em 1ex;
-                width: fit-content;
-                white-space: nowrap;
+            @include desktop {
+                > * {
+                    display: table-cell;
+                    width: fit-content;
+                    white-space: nowrap;
+                    padding: 0.1em 1ex;
+                }
             }
 
-            > .submitted {
-                color: green;
+            @include mobile {
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+                flex-wrap: wrap;
+                gap: 1ex;
+
+                > * {
+                    padding: 0 !important;
+                }
+
+                > .counter {
+                }
+    
+                > .submitted {
+                    color: green;
+                }
+    
+                > .name {
+                    text-align: left;
+                }
+    
+                > .joined {
+                    text-align: end;
+                    flex: 1 0 100%;
+    
+                }
             }
         }
     }
@@ -160,14 +194,14 @@
             <ol>
                 {#each players as player, i (player.address)}
                 <li>
-                    <div>{i + 1}.</div>
-                    <div><Player name={player.name} /></div>
+                    <div class="counter">{i + 1}.</div>
+                    <div class="name"><Player name={player.name} /></div>
                     <div class="submitted">
                         {#if player.submitted}
                         📄 ✓
                         {/if}
                     </div>
-                    <div>Joined {player.created.toLocaleDateString()}</div>
+                    <div class="joined">Joined {player.created.toLocaleDateString()}</div>
                 </li>
                 {/each}
             </ol>
