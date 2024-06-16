@@ -131,13 +131,6 @@
                 > * {
                     padding: 0 !important;
                 }
-
-                > .counter {
-                }
-    
-                > .submitted {
-                    color: green;
-                }
     
                 > .name {
                     text-align: left;

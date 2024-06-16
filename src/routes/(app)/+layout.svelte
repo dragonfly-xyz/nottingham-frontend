@@ -43,7 +43,7 @@
     onMount(() => {
         if (LAUNCHED) {
             loadContestState();
-            refreshTimer = setInterval(loadContestState, 60e3);
+            refreshTimer = setInterval(loadContestState, 10e3);
         }
     });
 
@@ -100,9 +100,34 @@
     }
 
     async function loadContestState(): Promise<void> {
-        setSeasons(await fetchContestState(publicClient));
-        // HACK: Need to do this to trigger updates for other subscribers.
-        $seasons;
+        const seasons_ = await fetchContestState(publicClient);
+        let isDifferentState = false;
+        if ($seasons.length === seasons_.length) {
+            found: for (let i = 0; i < seasons_.length; ++i) {
+                const s1 = $seasons[i];
+                const s2 = seasons_[i];
+                for (const k of Object.keys(s1)) {
+                    const v1 = (s1 as any)[k];
+                    const v2 = (s2 as any)[k];
+                    if (v1 != v2) {
+                        if (v1 instanceof Date) {
+                            if (v1.getTime() === v2.getTime()) {
+                                continue;
+                            }
+                        }
+                        isDifferentState = true;
+                        break found;
+                    }
+                }
+            }
+        } else {
+            isDifferentState = true;
+        }
+        if (isDifferentState) {
+            setSeasons(await fetchContestState(publicClient));
+            // HACK: Need to do this to trigger updates for other subscribers.
+            $seasons;
+        }
     }
 
     function toggleMusic() {
