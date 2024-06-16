@@ -144,7 +144,7 @@
             Players are ranked in a series of <em>offchain</em> tournament-style matches against each other, consisting of 4 players at a time. The top performing players of each bracket advance into the next bracket, and so on. The player that maintains the highest overall ranking in the final bracket wins the tournament!
         </p>
         <p>
-            To participate in tournaments, players must make at least one code submission while that season is open (before the Grand Faire). <span class="u">You can submit multiple times</span>, and are encouraged to! Only the most recent submission will be used. <em>Submissions from a prior season will not automatically roll over into the next.</em>
+            To participate in tournaments, players must make at least one code submission while that season is open (any time before the Grand Faire). <span class="u">You can submit multiple times</span> and are encouraged to do so over the 5 days! Only the most recent submission will be used. <em>Submissions from a prior season will not automatically roll over into the next.</em>
         </p>
         <p>
             Code submissions are published onchain but are encrypted with a key that will only be revealed when the season is closed (right before the Grand Faire). This allows players to decrypt past season winners to train against and incentivizes players to gradually refine their solutions.
