@@ -165,6 +165,7 @@ export interface SeasonInfo {
     startTime: Date; 
     closedTime: Date | null;
     isTerminal: boolean;
+    submissionsCount: number;
 }
 
 export interface ChainEvent {
@@ -206,6 +207,7 @@ export async function fetchContestState(
                 publicKey: event.publicKey,
                 isTerminal: seasons[seasons.length - 1]?.publicKey ===
                     event.publicKey,
+                submissionsCount: 0,
             });
         } else if (event.eventName === 'SeasonClosed') {
             const season = seasons[event.season];
@@ -232,7 +234,17 @@ export async function fetchContestState(
             lastSeason.unclaimedPrize = lastSeason.prize = currentSeasonPrize;
         }
     }
-    return resolveSeasonBlockTimes(client, seasons);
+    const [codeCounts, ] = await Promise.all([
+        multiReadContestContract<number[]>({
+            client,
+            calls: seasons.map((_, i) => ({ fn: 'playerCodeCount', args: [i] })),
+        }),
+        resolveSeasonBlockTimes(client, seasons),
+    ])
+    for (let i = 0; i < seasons.length; ++i) {
+        seasons[i].submissionsCount = codeCounts[i];
+    }
+    return seasons;
 }
 
 function sortChainEvents(events: ChainEvent[]): ChainEvent[] {

@@ -188,7 +188,13 @@
             </div>
             {/if}
             {:else}
-            <div>No games.</div>
+            <div>
+                {#if szn.submissionsCount < 4}
+                Games begin when 4 players submit code.
+                {:else}
+                No games yet.
+                {/if}
+            </div>
             {/if}
         </div>
     </div>
