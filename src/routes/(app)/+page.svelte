@@ -226,7 +226,7 @@
                 </ul>
             </li>
             <li>
-                <a href="https://https://t.me/+Fjy4JEgoqLJmZmI5" target="_blank">Telegram Support Group</a>
+                <a href="https://t.me/+Fjy4JEgoqLJmZmI5" target="_blank">Telegram Support Group</a>
                 <ul>
                     <li>Overburdened Guildsmen? Find Solace Here!</li>
                 </ul>
