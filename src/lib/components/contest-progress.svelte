@@ -190,7 +190,7 @@
             {:else}
             <div>
                 {#if szn.submissionsCount < 4}
-                Games begin when 4 players submit code.
+                Games begin after 4 players submit code.
                 {:else}
                 No games yet.
                 {/if}
