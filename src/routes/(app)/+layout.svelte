@@ -43,7 +43,7 @@
     onMount(() => {
         if (LAUNCHED) {
             loadContestState();
-            refreshTimer = setInterval(loadContestState, 10e3);
+            refreshTimer = setInterval(loadContestState, 60e3);
         }
     });
 
