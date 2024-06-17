@@ -178,7 +178,7 @@
                 <div class="field">
                     Winner:
                     {#if t.rankings[0]?.name}
-                    <Player name={t.rankings[0].name} />
+                    🏆️ <Player name={t.rankings[0].name} />
                     {:else}
                     None
                     {/if}
