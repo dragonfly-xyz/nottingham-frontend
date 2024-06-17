@@ -190,6 +190,9 @@
     {#if LAUNCHED}
     <section id="progress">
         <h2><a href="#progress" class="inherit">Contest Progress</a></h2>
+        <p>
+            Once the minimum number of players for a season (4) have submitted code, regular tournament results will appear here. You will be able to observe performance across brackets and even view a play-by-play of individual matches.
+        </p>
         <div class="content">
             <ContestProgress />
         </div>
