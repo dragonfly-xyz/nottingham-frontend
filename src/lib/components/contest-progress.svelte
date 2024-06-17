@@ -162,7 +162,10 @@
         </h3>
         <div class="tournaments">
             {#if tournamentsBySeason[szn.idx]?.length}
-            {#each tournamentsBySeason[szn.idx].slice().sort((a, b) => cmpDate(b.time, a.time)).slice(0, maxTournaments) as t, j (j)}
+            {#each tournamentsBySeason[szn.idx]
+                .slice()
+                .sort((a, b) => cmpDate(b.time, a.time))
+                .slice(0, Math.max(maxTournaments, $seasons.length > 1 ? maxTournaments : 8)) as t, j (j)}
             <div class="entry">
                 <h3>
                     <a href={`${base}/tournament?season=${szn.idx + 1}&id=${t.id}`}>
