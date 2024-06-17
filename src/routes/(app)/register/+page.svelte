@@ -383,7 +383,7 @@
                 </div>
             </div>
             <p>
-                Your wallet will need to be supplied with a small amount of ETH on the {$wallet.chain.name} network to complete registration and to make code future submissions.{#if $wallet.chain.id === 324}  You can quickly bridge ETH from Ethereum to {$wallet.chain.name} <a href="https://portal.zksync.io/bridge/" target="_blank">here</a>.{/if}
+                Your wallet will need to be supplied with a very small amount of ETH (much less than $1 worth) on the {$wallet.chain.name} network to complete registration and to make all future code submissions.{#if $wallet.chain.id === 324}  You can quickly bridge ETH from Ethereum to {$wallet.chain.name} <a href="https://portal.zksync.io/bridge/" target="_blank">here</a>.{/if}
             </p>
             <div>
                 <button
