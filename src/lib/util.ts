@@ -63,3 +63,13 @@ export function getFriendlyErrorMsg(err: Error): string {
     return (err as any).friendlyError ?? err.message;
 }
 
+export async function fetchJson<T = any>(url: string): Promise<T> {
+    const resp = await fetch(url, {
+        headers: { 'content-type': 'application/json' },
+    });
+    if (!resp.ok) {
+        const { error: errorMsg } = await resp.json();
+        throw new UserError(`Fetch failed: ${errorMsg}`);
+    }
+    return resp.json();
+}
