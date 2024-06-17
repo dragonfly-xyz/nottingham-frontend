@@ -192,7 +192,7 @@
                 {#if szn.submissionsCount < 4}
                 Games begin after 4 players submit code.
                 {:else}
-                No games yet.
+                Received at least 4 submissions. Games will begin soon.
                 {/if}
             </div>
             {/if}
