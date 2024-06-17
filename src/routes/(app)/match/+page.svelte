@@ -119,9 +119,10 @@
   }
 
   function parseRawLogs(logs: MatchLog[]): [Round[], Address[]] {
-    const players = logs[1].players;
+    const gameCreatedLogIdx = logs.findIndex(log => log.event === 'game_created');
+    const players = logs[gameCreatedLogIdx].players;
     const rounds = [] as Round[];
-    for (let roundStart = 2; roundStart < logs.length;) {
+    for (let roundStart = gameCreatedLogIdx + 1; roundStart < logs.length;) {
       const roundEnd = findLogEventIdx('round_played', logs, roundStart) + 1;
       if (roundEnd <= roundStart) {
         break;
@@ -236,6 +237,9 @@
     seasonIdx = Number(params.get('season') ?? '1') - 1;
     bracketIdx = Number(params.get('bracket') ?? '1') - 1;
     matchIdx = Number(params.get('idx') ?? '1') - 1;
+    if (isNaN(matchIdx)) {
+      matchIdx = undefined;
+    }
     matchId = params.get('match') ?? undefined;
   }
 
