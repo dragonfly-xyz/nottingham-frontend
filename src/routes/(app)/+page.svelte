@@ -147,7 +147,7 @@
             To participate in tournaments, players must make at least one code submission while that season is open (any time before the Grand Faire). <span class="u">You can submit multiple times</span> and are encouraged to do so over the 5 days! Only the most recent submission will be used. <em>Submissions from a prior season will not automatically roll over into the next.</em>
         </p>
         <p>
-            Code submissions are published onchain but are encrypted with a key that will only be revealed when the season is closed (right before the Grand Faire). This allows players to decrypt past season winners to train against and incentivizes players to gradually refine their solutions.
+            Code submissions are published onchain but are encrypted with a key that will only be revealed when the season is closed (right before the Grand Faire). This allows players to decrypt past season winners to train against and incentivizes players to gradually refine their solutions in the next.
         </p>
         {#if SCHEDULE.length}
         <div id="timeline">
