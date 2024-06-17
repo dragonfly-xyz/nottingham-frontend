@@ -28,6 +28,14 @@
     let tournamentsBySeason: Record<number, TournamentResult[]> = {};
     let refreshTimer: NodeJS.Timeout | null = null;
     export let maxTournaments = 5;
+    let maxTournamentsToDisplay = maxTournaments;
+
+    $: {
+        maxTournamentsToDisplay = Math.max(
+            maxTournaments,
+            $seasons.length > 1 ? maxTournaments : 10,
+        );
+    }
 
     onMount(() => {
         refreshTimer = setInterval(async () => {
@@ -163,9 +171,8 @@
         <div class="tournaments">
             {#if tournamentsBySeason[szn.idx]?.length}
             {#each tournamentsBySeason[szn.idx]
-                .slice()
-                .sort((a, b) => cmpDate(b.time, a.time))
-                .slice(0, Math.max(maxTournaments, $seasons.length > 1 ? maxTournaments : 8)) as t, j (j)}
+                .slice(0, maxTournamentsToDisplay)
+                .sort((a, b) => cmpDate(b.time, a.time)) as t, j (j)}
             <div class="entry">
                 <h3>
                     <a href={`${base}/tournament?season=${szn.idx + 1}&id=${t.id}`}>
@@ -185,7 +192,7 @@
                 </div>
             </div>
             {/each}
-            {#if tournamentsBySeason[szn.idx].length > maxTournaments}
+            {#if tournamentsBySeason[szn.idx].length > maxTournamentsToDisplay}
             <div class="more">
                 <a href={`${base}/season?season=${szn.idx + 1}`}>{tournamentsBySeason[szn.idx].length - maxTournaments} more tournaments...</a>
             </div>
