@@ -137,7 +137,7 @@
             On the last day of the season, a single "Grand Faire" tournament is held. The Grand Faire DOES award prizes (in ETH) to the winner, and will also consist of more matches for certainty. The Grand Faire prize increases with each successive season, as players naturally become more sophisticated with time.
         </p>
         <p>
-            The contest is free to join, but you will need a small amount of ETH on <a href={chain.blockExplorers?.default.url} target="_blank">{chain.name}</a> to cover gas for registration, submissions, and to claim any prizes.
+            The contest is free to join, but you will need a <em>very</em> small amount of ETH on <a href={chain.blockExplorers?.default.url} target="_blank">{chain.name}</a> to cover gas for registration, submissions, and to claim any prizes.
         </p>
         <h3 id="tournaments"><a href="#tournaments" class="inherit">Tournaments</a></h3>
         <p>
@@ -202,7 +202,7 @@
             <li>
                 <a href="https://github.com/dragonfly-xyz/nottingham-contracts" target="_blank">🚩 Game contracts</a> (start here!)
                 <ul>
-                    <li>A <a href="https://book.getfoundry.sh" target="_blank">foundry</a> development environment containing all the core game logic, sample players, and a local match runner. Once you've developed a contract, come back here to upload it and join tournaments during the season to see how it does.</li>
+                    <li>A <a href="https://book.getfoundry.sh" target="_blank">foundry</a> development environment containing all the core game logic, sample agents, and a local match runner. Once you've developed a contract, come back here to upload it and join tournaments during the season to see how it does.</li>
                 </ul>
             </li>
             <li>
