@@ -31,6 +31,7 @@
     bracket: number;
     duration: number;
     players: ScoredMatchPlayer[];
+    undeployedPlayers: string[];
     rounds: Round[];
     winnerIdx: number;
   }
@@ -92,17 +93,22 @@
               throw new Error(resp.statusText);
           }
           const r = await resp.json();
-          const [rounds, playerAddresses] = parseRawLogs(JSON.parse(r.logs));
+          const {
+            rounds,
+            players,
+            undeployedPlayers,
+          }  = parseRawLogs(JSON.parse(r.logs));
           return {
             tournamentId: r.tournamentId,
             season: r.season,
             type: r.type,
             bracket: r.bracket,
             duration: r.duration,
-            players: playerAddresses.map(addr => r.players.find((p: any) => p.address === addr)),
+            players: players.map(addr => r.players.find((p: any) => p.address === addr)),
+            undeployedPlayers: undeployedPlayers.map(addr => r.players.find((p: any) => p.address === addr).name),
             time: new Date(r.time),
             rounds: rounds,
-            winnerIdx: playerAddresses.findIndex(a => a === r.players[0].address),
+            winnerIdx: players.findIndex(a => a === r.players[0].address),
           };
       });
     } else {
@@ -118,7 +124,16 @@
     }
   }
 
-  function parseRawLogs(logs: MatchLog[]): [Round[], Address[]] {
+  interface ParsedLogs {
+    rounds: Round[];
+    players: Address[];
+    undeployedPlayers: Address[];
+  }
+
+  function parseRawLogs(logs: MatchLog[]): ParsedLogs {
+    const undeployedPlayers = logs.filter(
+        log => log.event === 'create_player_failed'
+      ).map(log => log.player);
     const gameCreatedLogIdx = logs.findIndex(log => log.event === 'game_created');
     const players = logs[gameCreatedLogIdx].players;
     const rounds = [] as Round[];
@@ -137,7 +152,7 @@
       rounds.push(round);
       roundStart = roundEnd;
     }
-    return [rounds, players];
+    return {rounds, players, undeployedPlayers};
   }
 
   function parseRoundFromLogs(opts: {
@@ -431,6 +446,18 @@
   .date {
     float: right;
   }
+
+  .deployment-failures {
+
+    margin: 1.5em 0ex;
+    
+    .failure {
+      &::before {
+        content: '🪦';
+        margin-right: 1ex;
+      }
+    }
+  }
 </style>
 
 <Page title="Match Details">
@@ -462,6 +489,15 @@
     </div>
   </Lede>
   <section>
+    {#if data.undeployedPlayers.length}
+    <div class="deployment-failures">
+      {#each data.undeployedPlayers as player}
+      <div class="failure">
+        <Player name={player} /> failed to deploy.
+      </div>
+      {/each}
+    </div>
+    {/if}
     {#each data.rounds as round, roundIdx (roundIdx)}
     <div class="round">
       <div class="round-header">
