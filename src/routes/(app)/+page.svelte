@@ -144,7 +144,7 @@
             Players are ranked in a series of <em>offchain</em> tournament-style matches against each other, consisting of 4 players at a time. The top performing players of each bracket advance into the next bracket, and so on. The player that maintains the highest overall ranking in the final bracket wins the tournament!
         </p>
         <p>
-            To participate in tournaments, players must make at least one code submission while that season is open (any time before the Grand Faire). <span class="u">You can submit multiple times</span> and are encouraged to do so over the 5 days! Only the most recent submission will be used. <em>Submissions from a prior season will not automatically roll over into the next.</em>
+            To participate in tournaments, players must make at least one code submission while that season is open (any time before the Grand Faire). <span class="u">You can submit multiple times</span> and are encouraged to do so over the 5 days! Only the most recent submission will be used, so there is no harm in submitting early. <em>Submissions from a prior season will not automatically roll over into the next.</em>
         </p>
         <p>
             Code submissions are published onchain but are encrypted with a key that will only be revealed when the season is closed (right before the Grand Faire). This allows players to decrypt past season winners to train against and incentivizes players to gradually refine their solutions in the next.
@@ -200,9 +200,9 @@
         <ul>
             {#if LAUNCHED}
             <li>
-                <a href="https://github.com/dragonfly-xyz/nottingham-contracts" target="_blank">Game contracts</a> (start here!)
+                <a href="https://github.com/dragonfly-xyz/nottingham-contracts" target="_blank">🚩 Game contracts</a> (start here!)
                 <ul>
-                    <li>A <a href="https://book.getfoundry.sh" target="_blank">foundry</a> development environment containing all the core game logic, sample players, and a local match runner.</li>
+                    <li>A <a href="https://book.getfoundry.sh" target="_blank">foundry</a> development environment containing all the core game logic, sample players, and a local match runner. Once you've developed a contract, come back here to upload it and join tournaments during the season to see how it does.</li>
                 </ul>
             </li>
             <li>
