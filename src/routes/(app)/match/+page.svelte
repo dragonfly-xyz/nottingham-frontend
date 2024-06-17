@@ -450,7 +450,7 @@
   .deployment-failures {
 
     margin: 1.5em 0ex;
-    
+
     .failure {
       &::before {
         content: '🪦';
@@ -542,7 +542,7 @@
           <button
             on:click={() => isRoundExpanded[roundIdx] = !isRoundExpanded[roundIdx]}
           ><span class="custom prefix"></span>
-            Block Activity
+            Block Activity {#if round.block}({round.block.swaps.length} swaps){/if}
           </button>
         </div>
         <div class="steps">
