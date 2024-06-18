@@ -92,12 +92,12 @@
 </style>
 
 <Page title="Season Details">
-  {#if data instanceof Promise}
+  {#if $seasons.length === 0 || data instanceof Promise}
   <div class="loading"><CatSpinner /></div>
   {:else if data instanceof Error}
   <CatSpinner failed />
   <div class="error">{getFriendlyErrorMsg(data)}</div>
-  {:else if data && seasonIdx !== null}
+  {:else if data && typeof(seasonIdx) === 'number'}
   <Lede>
     <h1>
       Season {seasonIdx + 1}
