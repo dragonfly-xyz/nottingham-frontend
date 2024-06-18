@@ -133,7 +133,7 @@
         {/if}
       </h3>
       <a href={`${base}/tournament?season=${seasonIdx+1}&id=${tournament.id}${
-        ''}${tournament.marketDayIndex !== undefined ? `&idx=${tournament.marketDayIndex}` : ''}`}>
+        ''}${tournament.marketDayIndex !== undefined ? `&idx=${tournament.marketDayIndex + 1}` : ''}`}>
         &gt;&gt; View tournament
       </a>
       <div>

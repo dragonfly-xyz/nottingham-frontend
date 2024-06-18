@@ -175,7 +175,7 @@
                 .sort((a, b) => cmpDate(b.time, a.time)) as t, j (j)}
             <div class="entry">
                 <h3>
-                    <a href={`${base}/tournament?season=${szn.idx + 1}&id=${t.id}`}>
+                    <a href={`${base}/tournament?season=${szn.idx + 1}&id=${t.id}&idx=${tournamentsBySeason[szn.idx].length - j}`}>
                         {#if t.type == 'scrimmage'} Market Day{:else}Grand Faire{/if}
                     </a>
                 </h3>
