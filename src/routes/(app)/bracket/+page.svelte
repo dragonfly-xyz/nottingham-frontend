@@ -159,7 +159,7 @@
             href={`${base}/match?tournament=${data.tournamentId}&season=${data.season + 1}&bracket=${data.bracket + 1}&match=${match.id}&idx=${i+1}`}
           >
             {#if match.rounds !== undefined}
-            ({match.rounds} rounds)
+            ({match.rounds}/32 rounds)
             {:else}
             (details)
             {/if}

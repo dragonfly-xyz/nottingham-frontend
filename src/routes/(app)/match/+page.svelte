@@ -529,7 +529,10 @@
           color: var(--player-4-color);
         }
       }
+    }
 
+    .rounds-count {
+      text-align: center;
     }
   }
 </style>
@@ -605,6 +608,9 @@
           {/each}
         </div>
       </Pancake.Chart>
+      <div class="rounds-count">
+        ({data.rounds.length}/32 rounds played)
+      </div>
     </div>
     {#if data.undeployedPlayers.length}
     <div class="deployment-failures">
