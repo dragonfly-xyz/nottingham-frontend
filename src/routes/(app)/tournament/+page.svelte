@@ -66,9 +66,12 @@ import { page } from "$app/stores";
     function parseQueryParams(params: URLSearchParams): void {
       tournamentId = params.get('id') ?? undefined;
       seasonIdx = Number(params.get('season') ?? '1') - 1;
-      tournamentIdx = Number(params.get('idx') ?? '1') - 1;
+      tournamentIdx = Number(params.get('idx') ?? NaN);
+      console.log(tournamentIdx);
       if (isNaN(tournamentIdx)) {
         tournamentIdx = undefined;
+      } else {
+        tournamentIdx -= 1;
       }
     }
 </script>

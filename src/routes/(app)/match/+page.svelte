@@ -264,9 +264,11 @@
     tournamentId = params.get('tournament') ?? undefined;
     seasonIdx = Number(params.get('season') ?? '1') - 1;
     bracketIdx = Number(params.get('bracket') ?? '1') - 1;
-    matchIdx = Number(params.get('idx') ?? '1') - 1;
+    matchIdx = Number(params.get('idx') ?? NaN);
     if (isNaN(matchIdx)) {
       matchIdx = undefined;
+    } else {
+      matchIdx -= 1;
     }
     matchId = params.get('match') ?? undefined;
   }
