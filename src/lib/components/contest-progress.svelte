@@ -64,6 +64,7 @@
             ...t,
             time: new Date(t.time),
         })) as TournamentResult[];
+        tourneys.sort((a, b) => b.time.getTime() - a.time.getTime());
         return tourneys.reduce(
             (a, t) => Object.assign(a,
                 { [t.season]: [ ...(a[t.season] ?? []), t], },
@@ -170,13 +171,16 @@
         </h3>
         <div class="tournaments">
             {#if tournamentsBySeason[szn.idx]?.length}
-            {#each tournamentsBySeason[szn.idx]
-                .slice(0, maxTournamentsToDisplay)
-                .sort((a, b) => cmpDate(b.time, a.time)) as t, j (j)}
+            {#each tournamentsBySeason[szn.idx].slice(0, maxTournamentsToDisplay)
+                as t, j (j)}
             <div class="entry">
                 <h3>
                     <a href={`${base}/tournament?season=${szn.idx + 1}&id=${t.id}&idx=${tournamentsBySeason[szn.idx].length - j}`}>
-                        {#if t.type == 'scrimmage'} Market Day{:else}Grand Faire{/if}
+                        {#if t.type == 'scrimmage'}
+                        Market Day
+                        {:else}
+                        Grand Faire
+                        {/if}
                     </a>
                 </h3>
                 <div class="field">
