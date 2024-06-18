@@ -1,4 +1,5 @@
 <script lang="ts">
+  import * as Pancake from '@sveltejs/pancake';
   import { base } from "$app/paths";
   import { page } from "$app/stores";
   import { PUBLIC_DATA_URL } from "$env/static/public";
@@ -16,6 +17,7 @@
 
   interface ScoredMatchPlayer extends ScoredPlayer {
     gasUsed: number;
+    idx: number; 
   }
 
   interface MatchLog {
@@ -104,7 +106,7 @@
             type: r.type,
             bracket: r.bracket,
             duration: r.duration,
-            players: players.map(addr => r.players.find((p: any) => p.address === addr)),
+            players: players.map((addr, i) => ({ ...r.players.find((p: any) => p.address === addr), idx: i })),
             undeployedPlayers: undeployedPlayers.map(addr => r.players.find((p: any) => p.address === addr).name),
             time: new Date(r.time),
             rounds: rounds,
@@ -458,6 +460,78 @@
       }
     }
   }
+
+  .chart {
+    height: 10em;
+    margin: 2em 0;
+    --player-1-color: rgb(87, 134, 17);
+    --player-2-color: rgb(212, 23, 23);
+    --player-3-color: rgb(32, 173, 220);
+    --player-4-color: rgb(202, 48, 202);
+
+    .player-scores {
+      .line {
+        fill: none;
+        stroke: gray;
+        stroke-width: 0.125em;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      &:nth-of-type(1) {
+        .line, .player-pt {
+          stroke: var(--player-1-color);
+        }
+      }
+      &:nth-of-type(2) {
+        .line, .player-pt {
+          stroke: var(--player-2-color);
+        }
+      }
+      &:nth-of-type(3) {
+        .line, .player-pt {
+          stroke: var(--player-3-color);
+        }
+      }
+      &:nth-of-type(4) {
+        .line, .player-pt {
+          stroke: var(--player-4-color);
+        }
+      }
+
+      .player-pt {
+        stroke-width: 0.6em;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+    }
+
+    .legend {
+      .trophy {
+        opacity: 0;
+        &.show {
+          opacity: 1;
+        }
+      }
+      .player-label {
+        position: relative;
+  
+        &:nth-of-type(1) > .score {
+          color: var(--player-1-color);
+        }
+        &:nth-of-type(2) > .score {
+          color: var(--player-2-color);
+        }
+        &:nth-of-type(3) > .score {
+          color: var(--player-3-color);
+        }
+        &:nth-of-type(4) > .score {
+          color: var(--player-4-color);
+        }
+      }
+
+    }
+  }
 </style>
 
 <Page title="Match Details">
@@ -489,6 +563,49 @@
     </div>
   </Lede>
   <section>
+    <div class="chart">
+      <Pancake.Chart
+        x1={0}
+        x2={data.rounds.length}
+        y1={0}
+        y2={
+          Math.max(...data.rounds
+            .map(r => r.balances.map(bs => bs.slice(1))).flat(2),
+          )}>
+        <div class="plots">
+          {#each data.players.slice().sort((a, b) => b.score - a.score) as player (player.idx)}
+          <div class="player-scores">
+            <Pancake.Svg>
+              <Pancake.SvgLine data={
+                  data.rounds.map((r, i) => ({
+                    x: i,
+                    y: Math.max(...r.balances[player.idx].slice(1)),
+                  }))
+                } let:d>
+                <path class="line" {d}></path>
+                <Pancake.SvgPoint
+                  x={data.rounds.length - 1}
+                  y={player.score}
+                  let:d>
+                  <path class="player-pt" {d}/>
+                </Pancake.SvgPoint>
+              </Pancake.SvgLine>
+            </Pancake.Svg>
+          </div>
+          {/each}
+        </div>
+
+        <div class="legend">
+        {#each data.players.slice().sort((a, b) => b.score - a.score) as player (player.idx)}
+            <div class="player-label">
+              <span class="trophy" class:show={player.idx === data.winnerIdx}>🏆️</span>
+              <Player name={player.name} />:
+              <span class="score">{formatAmount(player.score)}</span>
+            </div>
+          {/each}
+        </div>
+      </Pancake.Chart>
+    </div>
     {#if data.undeployedPlayers.length}
     <div class="deployment-failures">
       {#each data.undeployedPlayers as player}
