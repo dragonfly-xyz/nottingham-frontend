@@ -18,6 +18,7 @@
   interface ScoredMatchPlayer extends ScoredPlayer {
     gasUsed: number;
     idx: number; 
+    scoreAssetIdx: number;
   }
 
   interface MatchLog {
@@ -106,8 +107,18 @@
             type: r.type,
             bracket: r.bracket,
             duration: r.duration,
-            players: players.map((addr, i) => ({ ...r.players.find((p: any) => p.address === addr), idx: i })),
-            undeployedPlayers: undeployedPlayers.map(addr => r.players.find((p: any) => p.address === addr).name),
+            players: players.map((addr, i) => ({
+              ...r.players.find((p: any) => p.address === addr),
+              idx: i,
+              scoreAssetIdx: rounds[rounds.length - 1].balances[i]
+                .slice(1)
+                .map((a, i) => [i, a])
+                .sort((a, b) => b[1] - a[1])
+                .map(([i]) => i)[0] + 1,
+            })),
+            undeployedPlayers: undeployedPlayers.map(addr =>
+              r.players.find((p: any) => p.address === addr).name
+            ),
             time: new Date(r.time),
             rounds: rounds,
             winnerIdx: players.findIndex(a => a === r.players[0].address),
@@ -603,7 +614,10 @@
             <div class="player-label">
               <span class="trophy" class:show={player.idx === data.winnerIdx}>🏆️</span>
               <Player name={player.name} />:
-              <span class="score">{formatAmount(player.score)}</span>
+              <span class="score">
+                {getAssetEmoji(player.scoreAssetIdx)}
+                {formatAmount(player.score)}
+              </span>
             </div>
           {/each}
         </div>
