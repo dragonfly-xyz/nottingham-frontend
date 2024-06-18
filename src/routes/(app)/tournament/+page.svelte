@@ -67,7 +67,6 @@ import { page } from "$app/stores";
       tournamentId = params.get('id') ?? undefined;
       seasonIdx = Number(params.get('season') ?? '1') - 1;
       tournamentIdx = Number(params.get('idx') ?? NaN);
-      console.log(tournamentIdx);
       if (isNaN(tournamentIdx)) {
         tournamentIdx = undefined;
       } else {
