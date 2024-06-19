@@ -202,6 +202,8 @@
         const log = logs[i];
         if (log.event === 'block_bid') {
           bids[log.builderIdx] = Number(log.bid) / 1e18;
+        } else if (log.event === 'build_block_failed') {
+          bids[log.builderIdx] = NaN;
         } else {
           break;
         }
@@ -650,14 +652,21 @@
           <span class:builder={playerIdx === round.block?.builderIdx}>
             {#if roundIdx === data.rounds.length - 1 && playerIdx === data.winnerIdx}🏆️{/if}
             <Player name={data.players[playerIdx].name} />
-            {#if round.block?.bids && round.block.bids[playerIdx] > 0}
+            {#if round.block?.bids}
+            {#if round.block.bids[playerIdx] > 0}
             <span class="bid">
               bid
               <span class="asset">{getAssetEmoji(0)}</span>
               <span class="quantity">{formatAmount(round.block.bids[playerIdx])}</span>
-              and
             </span>
-            {/if}  
+            and
+            {:else if isNaN(round.block.bids[playerIdx])}
+            <span class="failed-bid">
+              FAILED their bid
+            </span>
+            and
+            {/if}
+            {/if}
             holds:
           </span>
           {#each round.balances[playerIdx] as bal, assetIdx}
