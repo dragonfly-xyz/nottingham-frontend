@@ -2,7 +2,7 @@
     import Page from "$lib/components/page.svelte";
     import { page } from "$app/stores";
     import { zeroHash, type Address, type Hex } from "viem";
-    import { goto } from "$app/navigation";
+    import { goto, replaceState } from "$app/navigation";
     import { browser } from "$app/environment";
     import { PUBLIC_DATA_URL } from "$env/static/public";
     import Lede from "$lib/components/lede.svelte";
@@ -39,7 +39,7 @@
         const querySortBy = $page.url.searchParams.get('sortBy');
         if (sortBy && querySortBy !== sortBy) {
             $page.url.searchParams.set('sortBy', sortBy);
-            window.history.replaceState(history.state, '', `?${$page.url.searchParams.toString()}`);
+            replaceState(`?${$page.url.searchParams.toString()}`, history.state);
         }
     }
     $: {
