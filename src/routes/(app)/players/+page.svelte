@@ -39,9 +39,7 @@
         const querySortBy = $page.url.searchParams.get('sortBy');
         if (sortBy && querySortBy !== sortBy) {
             $page.url.searchParams.set('sortBy', sortBy);
-            if (browser) {
-                goto(`?${$page.url.searchParams.toString()}`);
-            }
+            window.history.replaceState(history.state, '', `?${$page.url.searchParams.toString()}`);
         }
     }
     $: {
