@@ -82,7 +82,7 @@
 
     function getHumanTimeLeft(when: Date): string {
         const dt = when.getTime() - Date.now();
-        if (dt > ONE_DAY_MS) {
+        if (dt > ONE_DAY_MS * 2) {
             return `${Math.round(dt / ONE_DAY_MS)} days`;
         }
         if (dt >= ONE_HOUR_MS * 2) {
