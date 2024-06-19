@@ -314,7 +314,7 @@
         </div>
         {/if}
         <div class="disclaimer">
-            (*) "Skill" is a measure of <a href="https://openskill.me/en/stable/" target="_blank">predicted ability</a> based on overall ranking from all tournaments this season, normalized between 0-100.
+            (*) "Skill" is a <a href="https://openskill.me/en/stable/" target="_blank">metric</a> based on overall ranking from all tournaments this season, normalized between 0-100.
         </div>
     </section>
 </Page>
