@@ -68,6 +68,7 @@
                     rankings: t.rankings.sort((a: any, b: any) => b.score - a.score),
                 }))
                 .sort((a: any, b: any) => a.time - b.time)
+                .slice(0, 12)
                 .map((r: any) => r.rankings),
             );
             const players_ = playersResult.map((p: any, i: number) => ({
@@ -312,7 +313,7 @@
         </div>
         {/if}
         <div class="disclaimer">
-            (*) "Skill" is a <a href="https://openskill.me/en/stable/" target="_blank">metric</a> based on overall ranking from all tournaments this season, normalized between 0-100.
+            (*) "Skill" is a <a href="https://openskill.me/en/stable/" target="_blank">metric</a> based on final ranking from the last 12 tournaments this season, normalized between 0-100.
         </div>
     </section>
 </Page>

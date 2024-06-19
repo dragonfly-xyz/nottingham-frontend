@@ -131,7 +131,7 @@
             The contest will run approximately over a period of 15 days, with every 5 days marking a "Season." Seasons are made up of quick, daily tournaments and one final and conclusive tournament on the last day. Tournaments pit all players in the season against each other to produce an overall ranking.
         </p>
         <p>
-            On every day but the last of a season, "Market Day" tournaments will be held every 2 hours. These tournaments award no prizes but are important to partake in because they give players a sense of how well their contract performs against others and creates an opportunity to discover and experiment with meta-strategies.
+            On every day of a season, "Market Day" tournaments will be held every 2 hours. These tournaments award no prizes but are important to partake in because they give players a sense of how well their contract performs against others and creates an opportunity to discover and experiment with meta-strategies.
         </p>
         <p>
             On the last day of the season, a single "Grand Faire" tournament is held. The Grand Faire DOES award prizes (in ETH) to the winner, and will also consist of more matches for certainty. The Grand Faire prize increases with each successive season, as players naturally become more sophisticated with time.
@@ -144,10 +144,10 @@
             Players are ranked in a series of <em>offchain</em> tournament-style matches against each other, consisting of 4 players at a time. The top performing players of each bracket advance into the next bracket, and so on. The player that maintains the highest overall ranking in the final bracket wins the tournament!
         </p>
         <p>
-            To participate in tournaments, players must make at least one code submission while that season is open (any time before the Grand Faire). <span class="u">You can submit multiple times</span> and are encouraged to do so over the 5 days! Only the most recent submission will be used, so there is no harm in submitting early. <em>Submissions from a prior season will not automatically roll over into the next.</em>
+            To participate in tournaments, players must make at least one code submission while that season is open (any time before the Grand Faire). <em>Submissions from a prior season will not automatically roll over into the next.</em> <span class="u">You can submit multiple times</span> and are encouraged to do so over the 5 days! Only the most recent submission will be used, so there is no harm in submitting early.
         </p>
         <p>
-            Code submissions are published onchain but are encrypted with a key that will only be revealed when the season is closed (right before the Grand Faire). This allows players to decrypt past season winners to train against and incentivizes players to gradually refine their solutions in the next.
+            Code submissions are published onchain but are encrypted with a key that will only be revealed when the season is closes. This allows players to decrypt past season winners to train against and incentivizes players to gradually refine their solutions in the next.
         </p>
         {#if SCHEDULE.length}
         <div id="timeline">
