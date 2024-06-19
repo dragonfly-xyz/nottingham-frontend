@@ -515,9 +515,14 @@
       }
 
       .player-pt {
-        stroke-width: 0.6em;
+        stroke-width: 0.33em;
         stroke-linecap: round;
         stroke-linejoin: round;
+        box-sizing: border-box;
+
+        &.final {
+          stroke-width: 0.66em;
+        }
       }
     }
 
@@ -584,9 +589,9 @@
   <section>
     <div class="chart">
       <Pancake.Chart
-        x1={0}
+        x1={-1}
         x2={data.rounds.length}
-        y1={0}
+        y1={-1}
         y2={
           Math.max(...data.rounds
             .map(r => r.balances.map(bs => bs.slice(1))).flat(2),
@@ -602,13 +607,23 @@
                   }))
                 } let:d>
                 <path class="line" {d}></path>
-                <Pancake.SvgPoint
-                  x={data.rounds.length - 1}
-                  y={player.score}
-                  let:d>
-                  <path class="player-pt" {d}/>
-                </Pancake.SvgPoint>
               </Pancake.SvgLine>
+              {#each data.rounds as round, roundIdx}
+              {@const balances = round.balances[player.idx]}
+              {@const scoreAsset = balances
+                .slice(1)
+                .reduce((a, v, i) => v >= balances[a+1] ? i : a, 0) + 1
+              }
+              <Pancake.SvgPoint
+                x={roundIdx}
+                y={balances[scoreAsset]}
+                let:d>
+                <path
+                  class="player-pt"
+                  class:final={roundIdx === data.rounds.length - 1}
+                  {d}/>
+              </Pancake.SvgPoint>
+              {/each}
             </Pancake.Svg>
           </div>
           {/each}
