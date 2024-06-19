@@ -68,7 +68,7 @@
                     rankings: t.rankings.sort((a: any, b: any) => b.score - a.score),
                 }))
                 .sort((a: any, b: any) => a.time - b.time)
-                .slice(0, 12)
+                .slice(-12)
                 .map((r: any) => r.rankings),
             );
             const players_ = playersResult.map((p: any, i: number) => ({
