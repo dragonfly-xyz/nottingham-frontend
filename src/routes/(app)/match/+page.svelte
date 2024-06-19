@@ -478,7 +478,7 @@
 
   .chart {
     height: 10em;
-    margin: 2em 0;
+    margin: 2em 0 3em 0;
     --player-1-color: rgb(87, 134, 17);
     --player-2-color: rgb(212, 23, 23);
     --player-3-color: rgb(32, 173, 220);
@@ -548,6 +548,7 @@
 
     .rounds-count {
       text-align: center;
+      margin-top: 1em;
     }
   }
 </style>
@@ -670,10 +671,10 @@
             holds:
           </span>
           {#each round.balances[playerIdx] as bal, assetIdx}
-          {#if bal > 0}
+          {#if bal > 0 || round.balanceDeltas[playerIdx][assetIdx] !== 0}
           <div class="balance">
             <span class="asset">{getAssetEmoji(assetIdx)}</span>
-            <span class="quantity">{formatAmount(bal)}</span>
+            <span class="quantity">{formatAmount(Math.max(0, bal))}</span>
             {#if round.balanceDeltas[playerIdx][assetIdx] !== 0}
             <span class="delta" class:decreased={round.balanceDeltas[playerIdx][assetIdx] < 0}>
               ({formatAmountDelta(round.balanceDeltas[playerIdx][assetIdx])})
