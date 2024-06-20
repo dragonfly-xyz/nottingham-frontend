@@ -89,10 +89,10 @@
             return `${Math.round(dt / ONE_HOUR_MS)} hours`;
         }
         if (dt > ONE_HOUR_MS) {
-            return `${Math.round(dt / ONE_HOUR_MS)} hour`;
+            return `1 hour`;
         }
         if (dt > ONE_MINUTE_MS * 2) {
-            return `${Math.round(dt / ONE_HOUR_MS)} minutes`;
+            return `${Math.round(dt / ONE_MINUTE_MS)} minutes`;
         }
         return `a few seconds`;
     }
