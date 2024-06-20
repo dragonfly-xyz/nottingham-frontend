@@ -235,7 +235,7 @@
             <li>
                 <a href="https://t.me/+Fjy4JEgoqLJmZmI5" target="_blank">Telegram Support Group</a>
                 <ul>
-                    <li>Overburdened Guildsmen? Find Solace Here!</li>
+                    <li>Overburdened Guildsmen? Find Solace Here! Alpha drops regularly!</li>
                 </ul>
             </li>
         </ul>
