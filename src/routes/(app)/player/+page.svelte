@@ -290,7 +290,7 @@
         return s as Hex;
     }
 
-    async function populateCodeInputFromFileInput(): void {
+    async function populateCodeInputFromFileInput(): Promise<void> {
         const file = fileInputButton.files?.[0];
         if (!file) {
             rawCode = '0x';

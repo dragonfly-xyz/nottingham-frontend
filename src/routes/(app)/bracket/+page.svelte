@@ -38,6 +38,7 @@
   let bracketIdx: number | undefined;
   let data: BusyState<BracketData>;
   const dataAwait = createBusy<BracketData>(r => data = r);
+  let filterUserName: string | null = null;
 
   $: {
     parseQueryParams($page.url.searchParams);
@@ -73,12 +74,27 @@
     seasonIdx = Number(params.get('season') ?? '1') - 1;
     bracketIdx = Number(params.get('bracket') ?? '1') - 1;
   }
+
+  function testUserNameFilter(filter: string | null, names: string[]): boolean {
+    const needle = (filter ?? '').replaceAll(/\s/g, '');
+    if (!needle) {
+      return true;
+    }
+    return names.some(n => n.toLocaleLowerCase().includes(needle));
+  }
 </script>
 
 <style lang="scss">
   @use '../../../lib/styles/global.scss';
 
   .matches {
+    .summary {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
     .matches-grid {
       display: flex;
       flex-wrap: wrap;
@@ -100,10 +116,6 @@
 
   .smaller {
     font-size: 0.8em;
-  }
-
-  .date {
-    float: right;
   }
 
 </style>
@@ -144,13 +156,17 @@
   </section>
   <section class="matches">
     <h2>Matches</h2>
-    <div>
-      Players: {data.rankings.length},
-      Matches: {data.matches.length}
-      ({data.matches.length / Math.ceil(data.rankings.length / 4)}pp)
+    <div class="summary">
+      <div>
+        Players: {data.rankings.length},
+        Matches: {data.matches.length}
+        ({data.matches.length / Math.ceil(data.rankings.length / 4)}pp)
+      </div>
+      <input type="text" class="filter" placeholder="username" bind:value={filterUserName} />
     </div>
     <div class="matches-grid">
-    {#each data.matches as match, i (match.id)}
+      {#each data.matches as match, i (match.id)}
+      {#if testUserNameFilter(filterUserName, match.rankings.map(r => r.name))}
       <div class="match">
         <h3>
           Match {i + 1}
@@ -173,6 +189,7 @@
           {/each}
         </ol>
       </div>
+      {/if}
       {/each}
     </div>
   </section>
