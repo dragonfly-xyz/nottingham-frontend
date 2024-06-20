@@ -69,7 +69,7 @@ a.inherit, a.inherit:visited {
     font-weight: inherit;
 }
 
-button:not(.custom) {
+.__button {
     cursor: pointer;
     border-image: url('/button-border.png') 14% 12% / 0.66em 2ex round;
     background: none;
@@ -89,6 +89,10 @@ button:not(.custom) {
         opacity: 0.5;
         pointer-events: none;
     }
+}
+
+button:not(.custom) {
+    @extend .__button;
 }
 
 input:not([type]), input[type='text'], input[type='email'], textarea {

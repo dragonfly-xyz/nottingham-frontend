@@ -49,6 +49,7 @@
     let playerPrize: bigint = 0n;
     let currentSeason: SeasonInfo | null = null;
     let profileUrl: string | null = null;
+    let fileInputButton: HTMLInputElement;
 
     $: loadPlayerFromSearchParams($page.url.searchParams);
     $: {
@@ -175,11 +176,14 @@
 
     function onSubmitCode() {
         submittingCodeAwait(async () => {
-            let code = rawCode ?? '0x';
+            if (!rawCode) {
+                throw new UserError('Invalid bytecode hex.');
+            }
+            let code = rawCode;
             if (!code.startsWith('0x')) {
                 code = `0x${code}`;
             }
-            if (!/^0x[a-f0-9]*$/i.test(code)) {
+            if (!/^0x[a-f0-9]*$/i.test(code) && code.length % 2 !== 0) {
                 throw new UserError('Invalid bytecode hex.');
             }
             const hexCode = code as Hex;
@@ -285,6 +289,19 @@
         }
         return s as Hex;
     }
+
+    async function populateCodeInputFromFileInput(): void {
+        const file = fileInputButton.files?.[0];
+        if (!file) {
+            rawCode = '0x';
+            return;
+        }
+        try {
+            rawCode = findBytecode(JSON.parse(await file?.text()));
+        } catch {
+            submittingCodeState = new UserError(`Not a JSON compiler artifact.`);
+        }
+    }
 </script>
 
 <style lang="scss">
@@ -313,11 +330,10 @@
             width: 0 auto;
         }
 
-        button {
-            flex: 0 1 fit-content;
-            justify-self: end;
-            align-self: flex-end;
-            width: 20ex;
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
         }
     }
 
@@ -327,12 +343,18 @@
     }
 
     .error {
+        text-align: center;
+        margin: 1em 0;
         color: red;
     }
 
     .address {
         text-overflow: ellipsis;
         overflow: hidden;
+    }
+
+    input[type='file'] {
+        display: none;
     }
 
 </style>
@@ -436,7 +458,7 @@
             </p>
             {:else}
             <p>
-                You have already submitted your player code for the current season but you can replace your submission up until the season close.
+                You have already submitted your player code for the current season but you can replace your submission as often as you'd like up until the season close.
             </p>
             {/if}
             <p>
@@ -455,24 +477,30 @@
                         class="bytecode"
                         placeholder="Drop JSON artifact or paste (hex) bytecode"
                         on:drop|preventDefault={onBytecodeDrop}
+                        on:dragover|preventDefault
                         bind:value={rawCode}
-                    />
-                    <button
-                        aria-busy={submittingCodeState instanceof Promise}
-                        disabled={submittingCodeState instanceof Promise}
-                    >
-                        {#if typeof(submittingCodeState) === 'string'
-                            && submittingCodeState !== '0x'}
-                        Code Submitted!
-                        {:else}
-                        Submit Code
-                        {/if}
-                    </button>
+                        />
+                    <div class="buttons">
+                        <input type="file" bind:this={fileInputButton} on:change={() => populateCodeInputFromFileInput()}/>
+                        <button class="file" on:click|preventDefault={() => fileInputButton.click()}>
+                            Choose artifact
+                        </button>
+                        <button
+                            aria-busy={submittingCodeState instanceof Promise}
+                            disabled={!rawCode || submittingCodeState instanceof Promise}
+                        >
+                            {#if typeof(submittingCodeState) === 'string'
+                                && submittingCodeState !== '0x'}
+                            Code Submitted!
+                            {:else}
+                            Submit Code
+                            {/if}
+                        </button>
+                    </div>
                     {#if submittingCodeState instanceof Error}
                     <div class="error">
                         {getFriendlyErrorMsg(submittingCodeState)}
                     </div>
-                    {:else if typeof(submittingCodeState) === 'string' && submittingCodeState !== '0x'}
                     {/if}
                 </form>
             </div>
