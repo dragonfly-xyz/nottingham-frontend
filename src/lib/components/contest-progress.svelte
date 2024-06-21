@@ -137,6 +137,14 @@
                 }
             }
         }
+
+        &.current {
+            .prize {
+                font-size: 0.85em;
+                color: green;
+                text-decoration: underline;
+            }
+        }
     }
 </style>
 
@@ -150,7 +158,7 @@
     {#each $seasons
         .filter(s => !s.isTerminal).slice()
         .sort((a, b) => cmpDate(b.startTime, a.startTime)) as szn (szn.idx)}
-    <div class="season">
+    <div class="season" class:current={szn.idx === $seasons.length - 1}>
         <h3>
             <img class="leaf" src={`${base}/leaf.png`} alt="season" />
             <a href={`${base}/season?season=${szn.idx + 1}`}>Season {szn.idx + 1}</a>
@@ -164,7 +172,7 @@
                 {/if}
             </span>
             {#if szn.prize && szn.prize > 0n}
-            <span class="smaller">
+            <span class="smaller prize">
                 ({formatEther(szn.prize)} ETH prize)
             </span>
             {/if}
@@ -179,7 +187,7 @@
                         {#if t.type == 'scrimmage'}
                         Market Day
                         {:else}
-                        Grand Faire
+                        🎉 Grand Faire
                         {/if}
                     </a>
                 </h3>
