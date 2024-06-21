@@ -330,7 +330,10 @@
                     <a href={`${base}/players`}>Merchants</a>
                 </div>
                 <div>
-                    <a href="https://jobs.dragonfly.xyz/jobs" target="_blank">&gt;|&lt; Jobs</a>
+                    <a href="https://t.me/+Fjy4JEgoqLJmZmI5" target="_blank">Support</a>
+                </div>
+                <div>
+                    <a href="https://jobs.dragonfly.xyz/jobs" target="_blank">Jobs (&gt;|&lt;)</a>
                 </div>
             </div>
             <div class="right">
