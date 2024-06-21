@@ -225,17 +225,17 @@
             </li>
             {/if}
             <li>
-                <a href="https://x.com/dragonfly_xyz" target="_blank">Dragonfly Twitter Account</a>
+                <a href="https://t.me/+Fjy4JEgoqLJmZmI5" target="_blank">Telegram Support Group</a>
                 <ul>
-                    <li>
-                        Here we'll post progress updates and any important announcements. Be sure to follow!
-                    </li>
+                    <li>Overburdened Guildsmen? Find Solace Here! Announcements, lots of strategy/design discussions, technical support, and general good vibes.</li>
                 </ul>
             </li>
             <li>
-                <a href="https://t.me/+Fjy4JEgoqLJmZmI5" target="_blank">Telegram Support Group</a>
+                <a href="https://x.com/dragonfly_xyz" target="_blank">Dragonfly Twitter Account</a>
                 <ul>
-                    <li>Overburdened Guildsmen? Find Solace Here! Alpha drops regularly!</li>
+                    <li>
+                        Here we'll post major progress updates and any important announcements. Be sure to follow!
+                    </li>
                 </ul>
             </li>
         </ul>
