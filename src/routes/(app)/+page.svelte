@@ -208,14 +208,6 @@
                     <li>A <a href="https://book.getfoundry.sh" target="_blank">foundry</a> development environment containing all the core game logic, sample agents, and a local match runner. Once you've developed a contract, come back here to upload it and join tournaments during the season to see how it does.</li>
                 </ul>
             </li>
-            <li>
-                <a href={`${chain.blockExplorers?.default.url}address/${CONTEST_ADDRESS}`} target="_blank">Contest contract</a>
-                <ul>
-                    <li>
-                        The onchain component of the contest, which handles registration, submissions, and payouts.
-                    </li>
-                </ul>
-            </li>
             {:else}
             <li>
                 <a href="#resources">Game contracts</a>
@@ -235,6 +227,14 @@
                 <ul>
                     <li>
                         Here we'll post major progress updates and any important announcements. Be sure to follow!
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href={`${chain.blockExplorers?.default.url}address/${CONTEST_ADDRESS}`} target="_blank">Contest contract</a>
+                <ul>
+                    <li>
+                        The onchain component of the contest, which handles registration, submissions, and payouts.
                     </li>
                 </ul>
             </li>
