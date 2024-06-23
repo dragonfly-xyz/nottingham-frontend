@@ -466,6 +466,12 @@
     }
   }
 
+  section.date {
+    @include desktop {
+      display: none;
+    }
+  }
+
   .date {
     text-align: center;
   }
