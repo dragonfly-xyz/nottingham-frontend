@@ -113,7 +113,7 @@ import { page } from "$app/stores";
       <a href={`${base}/season?season=${data.season+1}`}>Season {data.season + 1}</a>
     </div>
     <div>
-      Time: {data.time.toLocaleDateString()} {data.time.toLocaleTimeString()}
+      {data.time.toLocaleString()}
     </div>
   </Lede>
   <div>

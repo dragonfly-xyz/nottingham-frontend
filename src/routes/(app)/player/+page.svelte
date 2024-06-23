@@ -50,6 +50,7 @@
     let currentSeason: SeasonInfo | null = null;
     let profileUrl: string | null = null;
     let fileInputButton: HTMLInputElement;
+    let expandedSeasons: boolean[] = [];
 
     $: loadPlayerFromSearchParams($page.url.searchParams);
     $: {
@@ -64,6 +65,7 @@
                 $wallet?.address,
             );
         }
+        expandedSeasons = $seasons.map((_, i) => expandedSeasons[i] ?? false );
     }
     $: {
         if (playerStats?.userId) {
@@ -307,15 +309,34 @@
 <style lang="scss">
     @import "../../../lib/styles/global.scss";
 
-    .tournament-result {
-        display: grid;
-        grid: auto / repeat(5, 1fr);
-        flex-direction: row;
-        gap: 1ex;
+    .season {
+        .tournament-result {
+            display: grid;
+            grid: auto / repeat(5, 1fr);
+            flex-direction: row;
+            gap: 1ex;
+    
+            &.header {
+                text-decoration: underline;
+                margin-bottom: 0.5em;
+            }
 
-        &.header {
-            text-decoration: underline;
-            margin-bottom: 0.5em;
+            &.optional {
+                display: none;
+            }
+        }
+
+        button.expand {
+            margin-left: 3ex;
+        }
+    
+        &.expanded {
+            button.expand {
+                display: none;
+            }
+            .optional {
+                display: grid;
+            }
         }
     }
 
@@ -419,7 +440,7 @@
         {:else}
         {#each playerStats.seasonResults as szn, i (i)}
         {#if szn.length}
-        <div class="season">
+        <div class="season" class:expanded={expandedSeasons[i]}>
             <h3>Season {playerStats.seasonResults.length - i}</h3>
             <div class="tournament-result header">
                 <div>Date</div>
@@ -427,7 +448,7 @@
                 <div>Rank</div>
                 <div>Score</div>
             </div>
-            {#each szn as tr (tr.tournamentId)}
+            {#each szn.slice(0, 10) as tr (tr.tournamentId)}
             <div class="tournament-result">
                 <div>
                     <a href={`${base}/tournament?season=${tr.season + 1}&id=${tr.tournamentId}`}>
@@ -439,6 +460,23 @@
                 <div>{formatScore(tr.score)}</div>
             </div>
             {/each}
+            {#if szn.length > 10}
+            <button class="expand custom" on:click={() => expandedSeasons[i] = true}>
+                [+] Show {szn.length - 10} more
+            </button>
+            {#each szn.slice(10) as tr (tr.tournamentId)}
+            <div class="tournament-result optional">
+                <div>
+                    <a href={`${base}/tournament?season=${tr.season + 1}&id=${tr.tournamentId}`}>
+                        {tr.time.toLocaleDateString()}
+                    </a>
+                </div>
+                <div>{tr.type === 'scrimmage' ? 'Market Day' : 'Grand Faire'}</div>
+                <div>{tr.rank+1} / {tr.totalPlayers}</div>
+                <div>{formatScore(tr.score)}</div>
+            </div>
+            {/each}
+            {/if}
         </div>
         {/if}
         {/each}

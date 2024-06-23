@@ -69,17 +69,9 @@ a.inherit, a.inherit:visited {
     font-weight: inherit;
 }
 
-.__button {
-    cursor: pointer;
-    border-image: url('/button-border.png') 14% 12% / 0.66em 2ex round;
-    background: none;
-    padding: 0.33em 2ex;
-    font-weight: bold;
-    font-family: 'Fondamento';
-    font-style: italic;
-    font-size: 1.05em; 
-    color: rgb(177, 27, 0);
+button {
     transition: transform 0.05s ease-out;
+    cursor: pointer;
 
     &:hover {
         transform: translate(0.25em, 0);
@@ -92,7 +84,27 @@ a.inherit, a.inherit:visited {
 }
 
 button:not(.custom) {
-    @extend .__button;
+    transition: transform 0.05s ease-out;
+    border-image: url('/button-border.png') 14% 12% / 0.66em 2ex round;
+    background: none;
+    padding: 0.33em 2ex;
+    font-weight: bold;
+    font-family: 'Fondamento';
+    font-style: italic;
+    font-size: 1.05em; 
+    color: rgb(177, 27, 0);
+}
+
+button.custom {
+    margin: 0.5em 0 0.5em 0;
+    padding: 0;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    font-style: inherit;
+    font-weight: inherit;
+    color: inherit;
 }
 
 input:not([type]), input[type='text'], input[type='email'], textarea {

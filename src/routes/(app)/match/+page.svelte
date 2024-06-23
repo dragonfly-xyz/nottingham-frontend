@@ -443,8 +443,6 @@
     }
 
     > .expand > button {
-      cursor: pointer;
-
       > .prefix::after {
         content: '[+] Show';
       } 
@@ -713,7 +711,7 @@
         {/each}
       </div>
       <div class="block" class:expanded={isRoundExpanded[roundIdx]}>
-        <div class="expand">
+        <div class="expand custom">
           <button
             on:click={() => isRoundExpanded[roundIdx] = !isRoundExpanded[roundIdx]}
           ><span class="custom prefix"></span>

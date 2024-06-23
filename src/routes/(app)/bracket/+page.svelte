@@ -85,7 +85,7 @@
 </script>
 
 <style lang="scss">
-  @use '../../../lib/styles/global.scss';
+  @use '../../../lib/styles/global.scss' as *;
 
   .matches {
     .summary {
@@ -131,7 +131,7 @@
     <h1>
       Bracket {data.bracket + 1}
     </h1>
-    <div class="date">{data.time.toLocaleDateString()}</div>
+    <div class="date">{data.time.toLocaleString()}</div>
     <div>
       <a href={`${base}/season?&season=${data.season + 1}`}>
         Season {data.season + 1}
