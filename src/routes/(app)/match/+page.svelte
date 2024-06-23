@@ -318,7 +318,7 @@
 </script>
 
 <style lang="scss">
-  @use '../../../lib/styles/global.scss';
+  @use '../../../lib/styles/global.scss' as *;
 
   .round-header {
     display: flex;
@@ -460,8 +460,16 @@
     }
   }
 
-  .date {
+  h1 + .date {
     float: right;
+
+    @include mobile {
+      display: none;
+    }
+  }
+
+  .date {
+    text-align: center;
   }
 
   .deployment-failures {
@@ -569,7 +577,7 @@
     <h1>
       Match {#if matchIdx !== undefined}{matchIdx + 1}{/if}
     </h1>
-    <div class="date">{data.time.toLocaleDateString()}</div>
+    <div class="date">{data.time.toLocaleString()}</div>
     <div>
       <a href={`${base}/season?season=${data.season + 1}`}>
         Season {data.season + 1}
@@ -586,6 +594,9 @@
       </a>
     </div>
   </Lede>
+  <section class="date">
+    {data.time.toLocaleString()}
+  </section>
   <section>
     <div class="chart">
       <Pancake.Chart
@@ -595,7 +606,7 @@
         y2={
           Math.max(...data.rounds
             .map(r => r.balances.map(bs => bs.slice(1))).flat(2),
-          )}>
+          ) + 1}>
         <div class="plots">
           {#each data.players.slice().sort((a, b) => b.score - a.score) as player (player.idx)}
           <div class="player-scores">
