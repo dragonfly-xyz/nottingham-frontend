@@ -65,7 +65,7 @@
     swaps: Swap[];
   }
 
-  const ASSET_EMOJIS = [ '🪙', '🍞', '🐟️', '🍎', '🥕', '👕' ];
+  const ASSET_EMOJIS = [ '🪙', '🍅', '🍞', '🐟️', '🥕', '👕' ];
 
   let tournamentId: string | undefined;
   let seasonIdx: number | undefined;
