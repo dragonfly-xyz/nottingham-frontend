@@ -72,8 +72,8 @@
 <style lang="scss">
     @import "../styles/global.scss";
 
-    button {
-        --size: 4em;
+    button.icon {
+        --size: 2.25em;
         --sheet-url: none;
         --row: 0;
         --col: 0;
@@ -107,4 +107,4 @@
     }
 </style>
 
-<button on:click style={joinStyles(vars)} title={title} class="custom" />
+<button on:click style={joinStyles(vars)} title={title} class="custom icon" />
