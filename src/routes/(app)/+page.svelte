@@ -219,7 +219,7 @@
             <li>
                 <a href="https://t.me/+Fjy4JEgoqLJmZmI5" target="_blank">Telegram Support Group</a>
                 <ul>
-                    <li>Overburdened Guildsmen? Find Solace Here! Announcements, lots of strategy/design discussions, technical support, and general good vibes.</li>
+                    <li>Overburdened Guildsmen? Find Solace Here! Important announcements, lots of strategy/design discussions, technical support, and general good vibes.</li>
                 </ul>
             </li>
             <li>
