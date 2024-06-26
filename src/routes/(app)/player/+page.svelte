@@ -500,7 +500,7 @@
             </p>
             {/if}
             <p>
-                Code submissions are posted on onchain but remain encrypted until the end of the current season, when the Grand Faire occurs.
+                Code submissions are posted onchain but remain encrypted until the end of the current season, when the Grand Faire occurs.
             </p>
             <p>
                 You can either drop your player's compiled (JSON) artifact file onto the text box below or you can manually paste the hex bytecode yourself.
