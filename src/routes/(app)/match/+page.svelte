@@ -54,7 +54,9 @@
   }
 
   interface Round {
+    market?: number[];
     resupply: number[][];
+    leaks: number[];
     block: Block | null;
     balances: number[][];
     balanceDeltas: number[][];
@@ -148,6 +150,10 @@
         log => log.event === 'create_player_failed'
       ).map(log => log.player);
     const gameCreatedLogIdx = logs.findIndex(log => log.event === 'game_created');
+    const marketInitializedLogIdx = logs.findIndex(log => log.event === 'market_initialized');
+    const initialMarketBalances = marketInitializedLogIdx !== -1
+      ? logs[marketInitializedLogIdx].reserves.map((r: bigint) => Number(r) / 1e18)
+      : undefined;
     const players = logs[gameCreatedLogIdx].players;
     const rounds = [] as Round[];
     for (let roundStart = gameCreatedLogIdx + 1; roundStart < logs.length;) {
@@ -161,6 +167,7 @@
         start: roundStart,
         end: roundEnd,
         lastRoundBalances: rounds[rounds.length - 1]?.balances ?? undefined,
+        lastRoundMarketBalances: rounds[rounds.length - 1]?.market ?? initialMarketBalances,
       });
       rounds.push(round);
       roundStart = roundEnd;
@@ -169,6 +176,7 @@
   }
 
   function parseRoundFromLogs(opts: {
+    lastRoundMarketBalances?: number[],
     lastRoundBalances?: number[][];
     playerCount: number;
     logs: MatchLog[];
@@ -179,6 +187,9 @@
     const resupply = createPlayerBalancesArrays(playerCount);
     const lastRoundBalances = opts.lastRoundBalances ??
       createPlayerBalancesArrays(playerCount);
+    const market = opts.lastRoundMarketBalances
+      ? opts.lastRoundMarketBalances.slice()
+      : undefined;
     const balances = opts.lastRoundBalances
       ? opts.lastRoundBalances.slice().map(v => v.slice())
       : createPlayerBalancesArrays(playerCount);
@@ -222,6 +233,10 @@
           swaps.push(swap);
           balances[swap.playerIdx][swap.fromAssetIdx] -= swap.fromAmount;
           balances[swap.playerIdx][swap.toAssetIdx] += swap.toAmount;
+          if (market) {
+            market[swap.fromAssetIdx] += swap.fromAmount;
+            market[swap.toAssetIdx] -= swap.toAmount;
+          }
         }
       }
       balances[builderIdx][0] -= bids[builderIdx];
@@ -232,7 +247,21 @@
         throw new Error(`Parse error: Expected empty block`);
       }
     }
+    const leaks = createBalanceArray(playerCount);
+    for (let i = start; i < end; ++i) {
+      const log = logs[i];
+      if (log.event !== 'leaked') {
+        continue;
+      }
+      const amount = Number(log.assetAmount) / 1e18;
+      if (market) {
+        market[log.assetIdx] -= amount;
+      }
+      leaks[log.assetIdx] = amount;
+    }
     return {
+      market,
+      leaks,
       resupply,
       block,
       balances,
@@ -369,6 +398,74 @@
   }
 
   .summary {
+
+    @include mobile {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    > .market{
+      float: right;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+
+      @include mobile {
+        float: none;
+        flex-direction: row;
+        justify-content: center;
+        margin: 0.5em 0;
+        order: 1;
+      }
+      
+      h3 {
+        margin: 0;
+
+        @include mobile {
+          margin: 0 1ex;
+          font-size: 1em;
+
+          &::after {
+            content: ':';
+          }
+        }
+      }
+
+      > .balances {
+        display: flex;
+        flex-direction: column;
+        align-items: end;
+
+        @include mobile {
+          flex-direction: row;
+          gap: 1ex;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        > .asset {
+          display: flex;
+          gap: 1ex;
+
+          @include mobile {
+            &::after {
+              content: ', ';
+              margin-left: -0.75ex;
+            }
+          }
+          
+          > .emoji {
+            order: 1;
+
+            @include mobile {
+              order: 0;
+            }
+          }
+        }
+      }
+    }
+
     > .player {
 
       > .balance {
@@ -678,6 +775,19 @@
         <div class="right" />
       </div>
       <div class="summary">
+        {#if round.market}
+        <div class="market">
+          <h3>🛒 Market</h3>
+          <div class="balances">
+            {#each round.market as balance, asset }
+            <div class="asset">
+              <span class="emoji">{getAssetEmoji(asset)}</span>
+              <span class="amount">{formatAmount(balance)}</span>
+            </div>
+            {/each}
+          </div>
+        </div>
+        {/if}
         {#each sortIndices(round.balances, bals => -Math.max(...bals)) as playerIdx}
         <div class="player">
           <span class:builder={playerIdx === round.block?.builderIdx}>
