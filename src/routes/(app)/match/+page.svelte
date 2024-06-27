@@ -593,6 +593,43 @@
     --player-3-color: rgb(32, 173, 220);
     --player-4-color: rgb(202, 48, 202);
 
+    *[data-rank='0'] {
+      color: var(--player-1-color);
+      path.line, .pt {
+        stroke: var(--player-1-color);
+      }
+      .pt {
+        background-color: var(--player-1-color);
+      }
+    }
+    *[data-rank='1'] {
+      color: var(--player-2-color);
+      path.line, .pt {
+        stroke: var(--player-2-color);
+      }
+      .pt {
+        background-color: var(--player-2-color);
+      }
+    }
+    *[data-rank='2'] {
+      color: var(--player-3-color);
+      path.line, .pt {
+        stroke: var(--player-3-color);
+      }
+      .pt {
+        background-color: var(--player-3-color);
+      }
+    }
+    *[data-rank='3'] {
+      color: var(--player-4-color);
+      path.line, .pt {
+        stroke: var(--player-4-color);
+      }
+      .pt {
+        background-color: var(--player-4-color);
+      }
+    }
+
     .player-scores {
       .line {
         fill: none;
@@ -601,36 +638,53 @@
         stroke-linecap: round;
         stroke-linejoin: round;
       }
+    }
 
-      &:nth-of-type(1) {
-        .line, .player-pt {
-          stroke: var(--player-1-color);
-        }
-      }
-      &:nth-of-type(2) {
-        .line, .player-pt {
-          stroke: var(--player-2-color);
-        }
-      }
-      &:nth-of-type(3) {
-        .line, .player-pt {
-          stroke: var(--player-3-color);
-        }
-      }
-      &:nth-of-type(4) {
-        .line, .player-pt {
-          stroke: var(--player-4-color);
-        }
-      }
+    .interactive-points {
+      .item {
+        text-decoration: none;
+        color: inherit; 
+        display: block; 
+        width: 1.5em;
+        height: 1.5em;
+        opacity: 0.33; 
+        cursor: pointer; 
+        position: relative;
 
-      .player-pt {
-        stroke-width: 0.33em;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        box-sizing: border-box;
+        .label {
+          display: none;
+          position: absolute;
+          // width: 100%;
+          white-space: nowrap;
+          bottom: 1.5em;
+          pointer-events: none;
+        }
 
+        .emoji {
+          font-size: 80%;
+          margin: calc(-0.8 * 1em) -30%;
+          position: relative;
+        }
+
+        &:hover {
+          opacity: 1;
+
+          .emoji {
+            font-size: 125% !important;
+            margin-left: -40%
+          }
+
+          .label {
+            display: initial;
+          }
+        }
+  
         &.final {
-          stroke-width: 0.66em;
+          opacity: 1;
+
+          .emoji {
+            font-size: 100%;
+          }
         }
       }
     }
@@ -643,20 +697,8 @@
         }
       }
       .player-label {
+        width: fit-content;
         position: relative;
-  
-        &:nth-of-type(1) > .score {
-          color: var(--player-1-color);
-        }
-        &:nth-of-type(2) > .score {
-          color: var(--player-2-color);
-        }
-        &:nth-of-type(3) > .score {
-          color: var(--player-3-color);
-        }
-        &:nth-of-type(4) > .score {
-          color: var(--player-4-color);
-        }
       }
     }
 
@@ -699,6 +741,8 @@
     {data.time.toLocaleString()}
   </section>
   <section>
+    {#if true}
+    {@const sortedPlayers = data.players.slice().sort((a, b) => b.score - a.score)}
     <div class="chart">
       <Pancake.Chart
         x1={-1}
@@ -709,8 +753,8 @@
             .map(r => r.balances.map(bs => bs.slice(1))).flat(2),
           ) + 1}>
         <div class="plots">
-          {#each data.players.slice().sort((a, b) => b.score - a.score) as player (player.idx)}
-          <div class="player-scores">
+          {#each sortedPlayers as player, i (player.idx)}
+          <div class="player-scores" data-rank={i}>
             <Pancake.Svg>
               <Pancake.SvgLine data={
                   data.rounds.map((r, i) => ({
@@ -720,30 +764,33 @@
                 } let:d>
                 <path class="line" {d}></path>
               </Pancake.SvgLine>
-              {#each data.rounds as round, roundIdx}
-              {@const balances = round.balances[player.idx]}
-              {@const scoreAsset = balances
-                .slice(1)
-                .reduce((a, v, i) => v >= balances[a+1] ? i : a, 0) + 1
-              }
-              <Pancake.SvgPoint
-                x={roundIdx}
-                y={balances[scoreAsset]}
-                let:d>
-                <path
-                  class="player-pt"
-                  class:final={roundIdx === data.rounds.length - 1}
-                  {d}/>
-              </Pancake.SvgPoint>
-              {/each}
             </Pancake.Svg>
           </div>
           {/each}
+          {#each sortedPlayers as player, i}
+          <div class="interactive-points" data-rank={i}>
+            {#each data.rounds as round, roundIdx}
+            {@const balances = round.balances[player.idx]}
+            {@const scoreAsset = balances
+              .slice(1)
+              .reduce((a, v, i) => v >= balances[a+1] ? i : a, 0) + 1
+            }
+            <Pancake.Point x={roundIdx} y={balances[scoreAsset]}>
+              <a class="item" class:final={roundIdx === data.rounds.length - 1}
+                href={`#round-${roundIdx+1}`}>
+                <div class="emoji">{getAssetEmoji(scoreAsset)}</div>
+                <div class="label">
+                  {formatAmount(balances[scoreAsset])}
+                </div>
+              </a>
+            </Pancake.Point>
+            {/each}
+          </div>
+          {/each}
         </div>
-
         <div class="legend">
-        {#each data.players.slice().sort((a, b) => b.score - a.score) as player (player.idx)}
-            <div class="player-label">
+        {#each sortedPlayers as player, i (player.idx)}
+            <div class="player-label" data-rank={i}>
               <span class="trophy" class:show={player.idx === data.winnerIdx}>🏆️</span>
               <Player name={player.name} />:
               <span class="score">
@@ -758,6 +805,7 @@
         ({data.rounds.length}/32 rounds played)
       </div>
     </div>
+    {/if}
     {#if data.undeployedPlayers.length}
     <div class="deployment-failures">
       {#each data.undeployedPlayers as player}
@@ -768,7 +816,7 @@
     </div>
     {/if}
     {#each data.rounds as round, roundIdx (roundIdx)}
-    <div class="round">
+    <div class="round" id={`round-${roundIdx+1}`}>
       <div class="round-header">
         <div class="left" />
         <h2 class="title">Round {roundIdx + 1}</h2>
