@@ -634,7 +634,7 @@
     .player-scores .line {
       fill: none;
       stroke: gray;
-      stroke-width: 0.125em;
+      stroke-width: 0.15em;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
@@ -649,6 +649,7 @@
         opacity: 0.33; 
         cursor: pointer; 
         position: relative;
+        opacity: 0; 
 
         .label {
           display: none;
@@ -708,7 +709,7 @@
     &.has-focus {
       .player-scores .line {
         &.focused {
-          stroke-width: 0.175em;
+          stroke-width: 0.185em;
           z-index: 1;
         }
         &:not(.focused) {
@@ -735,7 +736,7 @@
           }
         }
         &:not(.focused) {
-          opacity: 0.25;
+          // opacity: 0.25;
         }
       }
     }
@@ -817,7 +818,12 @@
                 class="item" class:final={roundIdx === data.rounds.length - 1}
                 class:focused={focusedPlayer?.address === player.address}
                 class:is-builder={round.block?.builderIdx === player.idx}
-                href={`#round-${roundIdx+1}`}>
+                href={`#round-${roundIdx+1}`}
+                on:mouseover={() => focusedPlayer = player}
+                on:mouseout={() => focusedPlayer = null}
+                on:focus={() => focusedPlayer = player}
+                on:blur={() => focusedPlayer = null}  
+                >
                 <div class="emoji">
                   {#if balances[scoreAsset] <= 0}
                   {getAssetEmoji(0)}
