@@ -710,6 +710,7 @@
       .player-scores .line {
         &.focused {
           stroke-width: 0.175em;
+          z-index: 1;
         }
         &:not(.focused) {
           opacity: 0.25;
@@ -719,6 +720,8 @@
       .interactive-points .item {
         &.focused {
           opacity: 1;
+          z-index: 1;
+          
           .emoji {
             font-size: 110%;
           }
