@@ -653,16 +653,16 @@
         .label {
           display: none;
           position: absolute;
-          // width: 100%;
           white-space: nowrap;
-          bottom: 1.5em;
+          bottom: 2.5em;
           pointer-events: none;
         }
 
         .emoji {
           font-size: 80%;
-          margin: calc(-0.8 * 1em) -30%;
-          position: relative;
+          top: calc(-0.75 * 1em);
+          left: calc(-0.8 * 1em);
+          position: absolute;
         }
 
         &:hover {
@@ -670,7 +670,6 @@
 
           .emoji {
             font-size: 125% !important;
-            margin-left: -40%
           }
 
           .label {
@@ -724,6 +723,15 @@
           
           .emoji {
             font-size: 110%;
+          }
+
+          &.is-builder {
+            .emoji {
+              // background-color: rgba(160, 209, 52, 0.5);
+              // border: 2px solid green;
+              // border-radius: 100%;
+              transform: scale(1.5) rotate(30deg);
+            }
           }
         }
         &:not(.focused) {
@@ -808,10 +816,21 @@
               <a
                 class="item" class:final={roundIdx === data.rounds.length - 1}
                 class:focused={focusedPlayer?.address === player.address}
+                class:is-builder={round.block?.builderIdx === player.idx}
                 href={`#round-${roundIdx+1}`}>
-                <div class="emoji">{getAssetEmoji(scoreAsset)}</div>
+                <div class="emoji">
+                  {#if balances[scoreAsset] <= 0}
+                  {getAssetEmoji(0)}
+                  {:else}
+                  {getAssetEmoji(scoreAsset)}
+                  {/if}
+                </div>
                 <div class="label">
+                  {#if balances[scoreAsset] <= 0}
+                  {formatAmount(balances[0])}
+                  {:else}
                   {formatAmount(balances[scoreAsset])}
+                  {/if}
                 </div>
               </a>
             </Pancake.Point>
