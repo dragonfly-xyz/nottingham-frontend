@@ -77,6 +77,7 @@
   let data: BusyState<MatchData>;
   const dataAwait = createBusy<MatchData>(r => data = r);
   let isRoundExpanded: boolean[] = [];
+  let focusedPlayer: ScoredMatchPlayer | null = null;
 
   $: {
     parseQueryParams($page.url.searchParams);
@@ -630,16 +631,14 @@
       }
     }
 
-    .player-scores {
-      .line {
-        fill: none;
-        stroke: gray;
-        stroke-width: 0.125em;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
+    .player-scores .line {
+      fill: none;
+      stroke: gray;
+      stroke-width: 0.125em;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
-
+   
     .interactive-points {
       .item {
         text-decoration: none;
@@ -706,6 +705,30 @@
       text-align: center;
       margin-top: 1em;
     }
+
+    &.has-focus {
+      .player-scores .line {
+        &.focused {
+          stroke-width: 0.175em;
+        }
+        &:not(.focused) {
+          opacity: 0.25;
+        }
+      }
+
+      .interactive-points .item {
+        &.focused {
+          opacity: 1;
+          .emoji {
+            font-size: 110%;
+          }
+        }
+        &:not(.focused) {
+          opacity: 0.25;
+        }
+      }
+    }
+
   }
 </style>
 
@@ -743,7 +766,7 @@
   <section>
     {#if true}
     {@const sortedPlayers = data.players.slice().sort((a, b) => b.score - a.score)}
-    <div class="chart">
+    <div class="chart" class:has-focus={!!focusedPlayer}>
       <Pancake.Chart
         x1={-1}
         x2={data.rounds.length}
@@ -762,7 +785,10 @@
                     y: Math.max(...r.balances[player.idx].slice(1)),
                   }))
                 } let:d>
-                <path class="line" {d}></path>
+                <path
+                  class="line"
+                  class:focused={focusedPlayer?.address === player.address}
+                  {d} />
               </Pancake.SvgLine>
             </Pancake.Svg>
           </div>
@@ -776,7 +802,9 @@
               .reduce((a, v, i) => v >= balances[a+1] ? i : a, 0) + 1
             }
             <Pancake.Point x={roundIdx} y={balances[scoreAsset]}>
-              <a class="item" class:final={roundIdx === data.rounds.length - 1}
+              <a
+                class="item" class:final={roundIdx === data.rounds.length - 1}
+                class:focused={focusedPlayer?.address === player.address}
                 href={`#round-${roundIdx+1}`}>
                 <div class="emoji">{getAssetEmoji(scoreAsset)}</div>
                 <div class="label">
@@ -790,7 +818,12 @@
         </div>
         <div class="legend">
         {#each sortedPlayers as player, i (player.idx)}
-            <div class="player-label" data-rank={i}>
+            <div class="player-label" data-rank={i}
+              on:mouseover={() => focusedPlayer = player}
+              on:mouseout={() => focusedPlayer = null}
+              on:focus={() => focusedPlayer = player}
+              on:blur={() => focusedPlayer = null}
+              >
               <span class="trophy" class:show={player.idx === data.winnerIdx}>🏆️</span>
               <Player name={player.name} />:
               <span class="score">
