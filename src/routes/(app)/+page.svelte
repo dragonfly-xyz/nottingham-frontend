@@ -131,7 +131,7 @@
             The contest will run approximately over a period of 15 days, with every 5 days marking a "Season." Seasons are made up of quick, daily tournaments and one final and conclusive tournament on the last day. Tournaments pit all players in the season against each other to produce an overall ranking.
         </p>
         <p>
-            On every day of a season, "Market Day" tournaments will be held every 2 hours. These tournaments award no prizes but are important to partake in because they give players a sense of how well their contract performs against others and creates an opportunity to discover and experiment with meta-strategies.
+            On every day of a season, "Market Day" tournaments will be held approximately <span class="u">every hour</span>. These tournaments award no prizes but are important to partake in because they give players a sense of how well their contract performs against others and creates an opportunity to discover and experiment with meta-strategies.
         </p>
         <p>
             On the last day of the season, a single "Grand Faire" tournament is held. The Grand Faire DOES award prizes (in ETH) to the winner, and will also consist of more matches for certainty. The Grand Faire prize increases with each successive season, as players naturally become more sophisticated with time.
